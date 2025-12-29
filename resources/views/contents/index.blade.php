@@ -2,9 +2,12 @@
 
 @section('container')
 
-<div class="content-wrapper">
-    <div class="page-header">
-        <h3 class="page-title">Basic Tables</h3>
+<div class="content-wrapper pb-0" x-data="productApp()">
+    <div class="page-header flex-wrap">
+        <h3 class="mb-0">
+            Hi, welcome back!
+            <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block">Your web analytics dashboard template.</span>
+        </h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#">Tables</a></li>
@@ -15,73 +18,91 @@
     <div class="row">
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📦 Data Produk</h5>
+                    <button class="btn btn-primary"
+                        hx-get="/products/create"
+                        hx-target="#modal-content"
+                        hx-push-url="false">
+                        + Tambah Produk
+                    </button>
+                </div>
                 <div class="card-body">
-                    <h4 class="card-title">Hoverable Table</h4>
-                    <p class="card-description"> Add class <code>.table-hover</code>
-                    </p>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Product</th>
-                                    <th>Sale</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Jacob</td>
-                                    <td>Photoshop</td>
-                                    <td class="text-danger"> 28.76% <i class="mdi mdi-arrow-down"></i>
-                                    </td>
-                                    <td>
-                                        <label class="badge badge-danger">Pending</label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Messsy</td>
-                                    <td>Flash</td>
-                                    <td class="text-danger"> 21.06% <i class="mdi mdi-arrow-down"></i>
-                                    </td>
-                                    <td>
-                                        <label class="badge badge-warning">In progress</label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>John</td>
-                                    <td>Premier</td>
-                                    <td class="text-danger"> 35.00% <i class="mdi mdi-arrow-down"></i>
-                                    </td>
-                                    <td>
-                                        <label class="badge badge-info">Fixed</label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Peter</td>
-                                    <td>After effects</td>
-                                    <td class="text-success"> 82.00% <i class="mdi mdi-arrow-up"></i>
-                                    </td>
-                                    <td>
-                                        <label class="badge badge-success">Completed</label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dave</td>
-                                    <td>53275535</td>
-                                    <td class="text-success"> 98.05% <i class="mdi mdi-arrow-up"></i>
-                                    </td>
-                                    <td>
-                                        <label class="badge badge-warning">In progress</label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <!-- Filter Section -->
+                    <div class="filter-section">
+                        <form id="filter-form" @submit.prevent="applyFilter()">
+                            <div class="row g-3">
+                                <!-- Search -->
+                                <div class="col-md-3">
+                                    <label class="form-label small text-muted">🔍 Cari Produk</label>
+                                    <input type="text"
+                                        class="form-control"
+                                        placeholder="Nama atau SKU..."
+                                        x-model="filters.search">
+                                </div>
+
+                                <!-- Min Price -->
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted">Harga Min</label>
+                                    <input type="number"
+                                        class="form-control"
+                                        placeholder="0"
+                                        x-model="filters.min_price">
+                                </div>
+
+                                <!-- Max Price -->
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted">Harga Max</label>
+                                    <input type="number"
+                                        class="form-control"
+                                        placeholder="999999"
+                                        x-model="filters.max_price">
+                                </div>
+
+                                <!-- Per Page -->
+                                <div class="col-md-2">
+                                    <label class="form-label small text-muted">Per Halaman</label>
+                                    <select class="form-select" x-model="filters.per_page" @change="applyFilter()">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100 me-1">
+                                        Filter
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" @click="resetFilter()">
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Product Table -->
+                    <div id="product-table">
+                        @include('partials.table')
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="mainModal" tabindex="-1" x-ref="modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="htmx-indicator">
+        <span class="loader"></span>
+    </div>
+
 </div>
 
 @endsection
