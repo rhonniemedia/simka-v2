@@ -1,0 +1,39 @@
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Pagination Styles */
+.pagination .page-item {
+    display: none;
+}
+
+.pagination .page-item:first-child,
+.pagination .page-item:nth-child(2) {
+    display: inline-block;
+}
+
+.pagination .page-item:last-child,
+.pagination .page-item:nth-last-child(2) {
+    display: inline-block;
+}
+
+.pagination .page-item.active,
+.pagination .page-item.active + .page-item,
+.pagination .page-item.active + .page-item + .page-item,
+.pagination .page-item:has(+ .page-item.active),
+.pagination .page-item:has(+ .page-item + .page-item.active) {
+    display: inline-block;
+}
+
+.pagination .page-item.disabled {
+    display: inline-block !important;
+}
+
+/* Filter Section */
+.filter-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}

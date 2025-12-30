@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@push('scripts')
+<script src="{{ asset('assets/js/modules/product.js') }}"></script>
+@endpush
+
 @section('container')
 
 <div class="content-wrapper pb-0" x-data="productApp()">
@@ -92,16 +96,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="mainModal" tabindex="-1" x-ref="modal">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" id="modal-content"></div>
-        </div>
-    </div>
+    <!-- Modal Component -->
+    <x-modal id="mainModal" />
 
-    <!-- Loading Overlay -->
-    <div id="loading" class="htmx-indicator">
-        <span class="loader"></span>
-    </div>
+    <!-- Loading Component -->
+    <x-loading />
 
 </div>
 

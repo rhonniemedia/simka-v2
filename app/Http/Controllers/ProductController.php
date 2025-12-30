@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Traits\HtmxResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
+    use HtmxResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -127,42 +130,5 @@ class ProductController extends Controller
         $product->delete();
 
         return $this->successResponse('productUpdated', 'Produk berhasil dihapus.');
-    }
-
-    // Helper Methods
-    protected function successResponse(string $event, string $message)
-    {
-        return response('', 204)->header('HX-Trigger', json_encode([
-            $event => null,
-            'showAlert' => [
-                'icon' => 'success',
-                'title' => 'Berhasil!',
-                'text' => $message
-            ]
-        ]));
-    }
-
-    protected function infoResponse(string $title, string $message)
-    {
-        return response('', 204)->header('HX-Trigger', json_encode([
-            'productUpdated' => null,
-            'showAlert' => [
-                'icon' => 'info',
-                'title' => $title,
-                'text' => $message
-            ]
-        ]));
-    }
-
-    /**
-     * @param Product $product
-     * @param ValidationException $e
-     * @return \Illuminate\View\View
-     */
-    protected function validationErrorResponse(Product $product, ValidationException $e)
-    {
-        /** @var \Illuminate\View\View $view */
-        $view = view('partials.form', compact('product'));
-        return $view->withErrors($e->validator);
     }
 }
