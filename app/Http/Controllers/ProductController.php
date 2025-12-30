@@ -76,7 +76,8 @@ class ProductController extends Controller
 
             return $this->successResponse('productSaved', 'Produk berhasil ditambahkan.');
         } catch (ValidationException $e) {
-            return $this->validationErrorResponse(new Product(), $e);
+            // Beritahu trait untuk menggunakan view 'partials.form' dengan alias variabel 'product'
+            return $this->validationErrorResponse(new Product(), $e, 'partials.form', 'product');
         }
     }
 
@@ -111,14 +112,15 @@ class ProductController extends Controller
             $product->fill($validated);
 
             if (!$product->isDirty()) {
-                return $this->infoResponse('Tidak Ada Perubahan', 'Data produk masih sama dengan sebelumnya.');
+                // Kita harus kirim event secara eksplisit sekarang agar global
+                return $this->infoResponse('Tidak Ada Perubahan', 'Data tetap sama.', 'productUpdated');
             }
 
             $product->save();
 
             return $this->successResponse('productUpdated', 'Produk berhasil diperbarui.');
         } catch (ValidationException $e) {
-            return $this->validationErrorResponse($product, $e);
+            return $this->validationErrorResponse($product, $e, 'partials.form', 'product');
         }
     }
 

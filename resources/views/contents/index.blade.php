@@ -32,60 +32,46 @@
                     </button>
                 </div>
                 <div class="card-body">
-                    <!-- Filter Section -->
-                    <div class="filter-section">
-                        <form id="filter-form" @submit.prevent="applyFilter()">
-                            <div class="row g-3">
-                                <!-- Search -->
-                                <div class="col-md-3">
-                                    <label class="form-label small text-muted">🔍 Cari Produk</label>
-                                    <input type="text"
-                                        class="form-control"
-                                        placeholder="Nama atau SKU..."
-                                        x-model="filters.search">
-                                </div>
+                    <!-- Filter Component -->
+                    <x-filter>
+                        <!-- Search -->
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">🔍 Cari Produk</label>
+                            <input type="text"
+                                class="form-control"
+                                placeholder="Nama atau SKU..."
+                                x-model="filters.search">
+                        </div>
 
-                                <!-- Min Price -->
-                                <div class="col-md-2">
-                                    <label class="form-label small text-muted">Harga Min</label>
-                                    <input type="number"
-                                        class="form-control"
-                                        placeholder="0"
-                                        x-model="filters.min_price">
-                                </div>
+                        <!-- Min Price -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted">Harga Min</label>
+                            <input type="number"
+                                class="form-control"
+                                placeholder="0"
+                                x-model="filters.min_price">
+                        </div>
 
-                                <!-- Max Price -->
-                                <div class="col-md-2">
-                                    <label class="form-label small text-muted">Harga Max</label>
-                                    <input type="number"
-                                        class="form-control"
-                                        placeholder="999999"
-                                        x-model="filters.max_price">
-                                </div>
+                        <!-- Max Price -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted">Harga Max</label>
+                            <input type="number"
+                                class="form-control"
+                                placeholder="999999"
+                                x-model="filters.max_price">
+                        </div>
 
-                                <!-- Per Page -->
-                                <div class="col-md-2">
-                                    <label class="form-label small text-muted">Per Halaman</label>
-                                    <select class="form-select" x-model="filters.per_page" @change="applyFilter()">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100 me-1">
-                                        Filter
-                                    </button>
-                                    <button type="button" class="btn btn-secondary" @click="resetFilter()">
-                                        Reset
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                        <!-- Per Page -->
+                        <div class="col-md-2">
+                            <label class="form-label small text-muted">Per Halaman</label>
+                            <select class="form-select" x-model="filters.per_page" @change="applyFilter()">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </x-filter>
 
                     <!-- Product Table -->
                     <div id="product-table">
