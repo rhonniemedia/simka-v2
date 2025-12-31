@@ -133,7 +133,9 @@ return new class extends Migration
             // ===== FILE & STATUS =====
             $table->string('foto')->nullable()
                 ->comment('Path file foto profil');
-            $table->string('jurusan', 100)
+            $table->foreignUuid('jurusan_id')
+                ->constrained('jurusans')
+                ->onDelete('restrict')
                 ->comment('Jurusan/bidang keahlian');
             $table->enum('status', ['aktif', 'mutasi', 'pensiun'])
                 ->default('aktif')
@@ -159,6 +161,7 @@ return new class extends Migration
             $table->index(['sp_id', 'status'], 'idx_sp_status');
             $table->index(['jp_id', 'status'], 'idx_jp_status');
             $table->index(['jab_id', 'status'], 'idx_jab_status');
+            $table->index(['jurusan_id', 'status'], 'idx_jur_status');
             $table->index(['status', 'tmt_status'], 'idx_status_tmt');
 
             // Index untuk login/search via hash (CRITICAL untuk performance)

@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class JenisPegawai extends Model
+class Jurusan extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $table = 'jenis_pegawais';
+    protected $table = 'jurusans';
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -19,14 +19,4 @@ class JenisPegawai extends Model
         'nama',
         'alias',
     ];
-
-    public function pegawais()
-    {
-        return $this->hasMany(Pegawai::class, 'jp_id');
-    }
-
-    public function jabatans()
-    {
-        return $this->hasMany(Jabatan::class, 'jenis_pegawai_id');
-    }
 }
