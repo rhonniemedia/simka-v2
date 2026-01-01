@@ -22,7 +22,7 @@
                 <td class="text-end">
                     <button class="btn btn-sm btn-outline-info"
                         hx-get="/products/{{ $p->id }}/edit"
-                        hx-target="#modal-content"
+                        hx-target="#mainModal-content"
                         hx-push-url="false"
                         hx-indicator="#loading">
                         Edit
@@ -30,6 +30,13 @@
                     <button class="btn btn-sm btn-outline-danger"
                         @click="confirmDelete({{ $p->id }}, '{{ addslashes($p->name) }}')">
                         Hapus
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning"
+                        hx-get="/products/{{ $p->id }}"
+                        hx-target="#detailModal-content"
+                        hx-push-url="false"
+                        hx-on::after-swap="Alpine.$data(document.querySelector('[x-data]')).detailModal.show()">
+                        Detail
                     </button>
                 </td>
             </tr>
@@ -46,7 +53,6 @@
 @endif
 
 <script>
-    // Wait for Alpine to be ready
     document.addEventListener('alpine:init', () => {
         setTimeout(() => {
             document.querySelectorAll('.pagination a').forEach(link => {
@@ -66,14 +72,5 @@
                 });
             });
         }, 100);
-    });
-
-    document.body.addEventListener('htmx:afterSettle', (e) => {
-        if (e.detail.target.id === 'product-table') {
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.classList.remove('show-loading');
-            }
-        }
     });
 </script>

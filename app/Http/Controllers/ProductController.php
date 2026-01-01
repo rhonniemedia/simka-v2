@@ -46,10 +46,10 @@ class ProductController extends Controller
         $products = $query->latest()->paginate($perPage)->withQueryString();
 
         if ($request->header('HX-Request')) {
-            return view('partials.table', compact('products'));
+            return view('contents.product.partials.table', compact('products'));
         }
 
-        return view('contents.index', compact('products'));
+        return view('contents.product.index', compact('products'));
     }
 
     /**
@@ -57,7 +57,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('partials.form', ['product' => new Product()]);
+        return view('contents.product.partials.form', ['product' => new Product()]);
     }
 
     /**
@@ -77,7 +77,7 @@ class ProductController extends Controller
             return $this->successResponse('productSaved', 'Produk berhasil ditambahkan.');
         } catch (ValidationException $e) {
             // Beritahu trait untuk menggunakan view 'partials.form' dengan alias variabel 'product'
-            return $this->validationErrorResponse(new Product(), $e, 'partials.form', 'product');
+            return $this->validationErrorResponse(new Product(), $e, 'contents.product.partials.form', 'product');
         }
     }
 
@@ -86,7 +86,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return view('contents.product.partials.detail', compact('product'));
     }
 
     /**
@@ -94,7 +94,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return view('partials.form', compact('product'));
+        return view('contents.product.partials.form', compact('product'));
     }
 
     /**
@@ -120,7 +120,7 @@ class ProductController extends Controller
 
             return $this->successResponse('productUpdated', 'Produk berhasil diperbarui.');
         } catch (ValidationException $e) {
-            return $this->validationErrorResponse($product, $e, 'partials.form', 'product');
+            return $this->validationErrorResponse($product, $e, 'contents.product.partials.form', 'product');
         }
     }
 

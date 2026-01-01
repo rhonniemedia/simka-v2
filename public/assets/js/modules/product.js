@@ -5,38 +5,50 @@
 function productApp() {
     return {
         bsModal: null,
+        detailModal: null,
         currentPage: 1,
         filters: {
-            search: '',
-            min_price: '',
-            max_price: '',
-            per_page: '10'
+            search: "",
+            min_price: "",
+            max_price: "",
+            per_page: "10",
         },
 
         init() {
-            console.log('✅ Product Module initialized');
-            
-            this.bsModal = window.initModal('mainModal');
+            console.log("✅ Product Module initialized");
+
+            // Modal untuk CRUD
+            this.bsModal = window.initModal("mainModal");
+
+            // Modal untuk Detail
+            this.detailModal = window.initModal("detailModal");
+
             this.loadFiltersFromURL();
             this.setupEventListeners();
         },
 
         setupEventListeners() {
-            // Open modal after HTMX loads content
-            document.body.addEventListener('htmx:afterSwap', (e) => {
-                if (e.detail.target.id === 'modal-content') {
+            // Open modal after HTMX loads content untuk mainModal
+            document.body.addEventListener("htmx:afterSwap", (e) => {
+                if (e.detail.target.id === "mainModal-content") {
                     this.bsModal.show();
+                }
+
+                // untuk detail modal
+                if (e.detail.target.id === "detailModal-content") {
+                    this.detailModal.show();
                 }
             });
 
             // Refresh after update/delete
-            document.body.addEventListener('productUpdated', () => {
+            document.body.addEventListener("productUpdated", () => {
                 this.bsModal.hide();
+                this.detailModal.hide();
                 this.loadProducts(false);
             });
 
             // Refresh after create
-            document.body.addEventListener('productSaved', () => {
+            document.body.addEventListener("productSaved", () => {
                 this.bsModal.hide();
                 this.currentPage = 1;
                 this.loadProducts(false);
@@ -45,11 +57,11 @@ function productApp() {
 
         loadFiltersFromURL() {
             const params = new URLSearchParams(window.location.search);
-            this.filters.search = params.get('search') || '';
-            this.filters.min_price = params.get('min_price') || '';
-            this.filters.max_price = params.get('max_price') || '';
-            this.filters.per_page = params.get('per_page') || '10';
-            this.currentPage = parseInt(params.get('page')) || 1;
+            this.filters.search = params.get("search") || "";
+            this.filters.min_price = params.get("min_price") || "";
+            this.filters.max_price = params.get("max_price") || "";
+            this.filters.per_page = params.get("per_page") || "10";
+            this.currentPage = parseInt(params.get("page")) || 1;
         },
 
         applyFilter() {
@@ -59,10 +71,10 @@ function productApp() {
 
         resetFilter() {
             this.filters = {
-                search: '',
-                min_price: '',
-                max_price: '',
-                per_page: '10'
+                search: "",
+                min_price: "",
+                max_price: "",
+                per_page: "10",
             };
             this.currentPage = 1;
             this.loadProducts(true);
@@ -71,12 +83,14 @@ function productApp() {
         loadProducts(showLoading = true) {
             const params = new URLSearchParams({
                 page: this.currentPage,
-                per_page: this.filters.per_page
+                per_page: this.filters.per_page,
             });
 
-            if (this.filters.search) params.set('search', this.filters.search);
-            if (this.filters.min_price) params.set('min_price', this.filters.min_price);
-            if (this.filters.max_price) params.set('max_price', this.filters.max_price);
+            if (this.filters.search) params.set("search", this.filters.search);
+            if (this.filters.min_price)
+                params.set("min_price", this.filters.min_price);
+            if (this.filters.max_price)
+                params.set("max_price", this.filters.max_price);
 
             const url = `/products?${params.toString()}`;
 
@@ -84,18 +98,45 @@ function productApp() {
                 window.showLoading();
             }
 
-            htmx.ajax('GET', url, {
-                target: '#product-table',
-                swap: 'innerHTML'
-            });
+            // Fallback timeout: hide loading after 5 seconds if stuck
+            const loadingTimeout = setTimeout(() => {
+                const loading = document.getElementById("loading");
+                if (loading) {
+                    loading.classList.remove("show-loading");
+                    console.warn("⚠️ Loading timeout - forced close");
+                }
+            }, 5000);
 
-            window.history.pushState({}, '', url);
+            // Make HTMX request with error handling
+            htmx.ajax("GET", url, {
+                target: "#product-table",
+                swap: "innerHTML",
+            })
+                .then(() => {
+                    // Success: hide loading
+                    clearTimeout(loadingTimeout);
+                    const loading = document.getElementById("loading");
+                    if (loading) {
+                        loading.classList.remove("show-loading");
+                    }
+                })
+                .catch((error) => {
+                    // Error: hide loading and show error
+                    clearTimeout(loadingTimeout);
+                    const loading = document.getElementById("loading");
+                    if (loading) {
+                        loading.classList.remove("show-loading");
+                    }
+                    console.error("❌ Failed to load products:", error);
+                });
+
+            window.history.pushState({}, "", url);
         },
 
         confirmDelete(id, name) {
             window.confirmDelete(id, name, `/products/${id}`);
-        }
-    }
+        },
+    };
 }
 
-console.log('✅ Product module loaded');
+console.log("✅ Product module loaded");
