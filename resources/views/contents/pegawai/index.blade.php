@@ -49,6 +49,7 @@
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Status Pegawai</label>
                             <select class="form-select" x-model="filters.sp" @change="applyFilter()">
+                                <option value="" disabled>-- Pilih Status --</option>
                                 @foreach($statusPegawais as $status)
                                 <option value="{{ $status->id }}">{{ $status->nama }}</option>
                                 @endforeach
@@ -59,6 +60,7 @@
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Jenis Pegawai</label>
                             <select class="form-select" x-model="filters.jp" @change="applyFilter()">
+                                <option value="" disabled>-- Pilih Jenis Pegawai --</option>
                                 @foreach($jenisPegawais as $jenis)
                                 <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>
                                 @endforeach
@@ -71,7 +73,9 @@
                             <input type="text"
                                 class="form-control"
                                 placeholder="Nama atau Nomor Induk..."
-                                x-model="filters.search">
+                                x-model="filters.search"
+                                @input.debounce.500ms="applyFilter()"
+                                @keyup.enter="applyFilter()">
                         </div>
                     </x-filter>
 

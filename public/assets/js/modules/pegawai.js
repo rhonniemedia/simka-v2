@@ -9,8 +9,8 @@ function pegawaiApp() {
         currentPage: 1,
         filters: {
             search: "",
-            min_price: "",
-            max_price: "",
+            sp: "",
+            jp: "",
             per_page: "10",
         },
 
@@ -25,7 +25,7 @@ function pegawaiApp() {
 
             this.loadFiltersFromURL();
             this.setupEventListeners();
-            this.attachPaginationListeners(); // ✅ Panggil pertama kali
+            this.attachPaginationListeners();
         },
 
         setupEventListeners() {
@@ -61,7 +61,6 @@ function pegawaiApp() {
             });
         },
 
-        // ✅ METHOD BARU - Attach pagination listeners
         attachPaginationListeners() {
             document.querySelectorAll('#pegawai-table .pagination a').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -80,8 +79,8 @@ function pegawaiApp() {
         loadFiltersFromURL() {
             const params = new URLSearchParams(window.location.search);
             this.filters.search = params.get("search") || "";
-            this.filters.min_price = params.get("min_price") || "";
-            this.filters.max_price = params.get("max_price") || "";
+            this.filters.sp = params.get("sp_id") || "";
+            this.filters.jp = params.get("jp_id") || "";
             this.filters.per_page = params.get("per_page") || "10";
             this.currentPage = parseInt(params.get("page")) || 1;
         },
@@ -94,8 +93,8 @@ function pegawaiApp() {
         resetFilter() {
             this.filters = {
                 search: "",
-                min_price: "",
-                max_price: "",
+                sp: "",
+                jp: "",
                 per_page: "10",
             };
             this.currentPage = 1;
@@ -108,11 +107,20 @@ function pegawaiApp() {
                 per_page: this.filters.per_page,
             });
 
-            if (this.filters.search) params.set("search", this.filters.search);
-            if (this.filters.min_price)
-                params.set("min_price", this.filters.min_price);
-            if (this.filters.max_price)
-                params.set("max_price", this.filters.max_price);
+            // ✅ Tambahkan filter search (dengan trim)
+            if (this.filters.search && this.filters.search.trim()) {
+                params.set("search", this.filters.search.trim());
+            }
+            
+            // ✅ Tambahkan filter status pegawai
+            if (this.filters.sp) {
+                params.set("sp_id", this.filters.sp);
+            }
+
+            // ✅ Tambahkan filter jenis pegawai
+            if (this.filters.jp) {
+                params.set("jp_id", this.filters.jp);
+            }
 
             const url = `/pegawais?${params.toString()}`;
 

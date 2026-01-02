@@ -218,6 +218,71 @@ class Pegawai extends Model
         return $query->where('status', 'aktif');
     }
 
+    /**
+     * Scope untuk pencarian pegawai
+     * Disesuaikan untuk data yang terenkripsi
+     * 
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, string $search)
+    {
+        return $query->where(function ($q) use ($search) {
+            // ✅ 1. Search by NAMA (tidak terenkripsi)
+            $q->where('nama', 'like', "%{$search}%");
+
+            // ✅ 2. Search by T_LAHIR (tempat lahir - tidak terenkripsi)
+            $q->orWhere('t_lahir', 'like', "%{$search}%");
+
+            // ✅ 3. Search by PMK (tidak terenkripsi)
+            $q->orWhere('pmk', 'like', "%{$search}%");
+
+            // ✅ 4. Search by HASH fields (untuk exact match)
+            // Cek apakah search input adalah nomor yang valid
+            if (is_numeric(str_replace(['-', ' ', '.'], '', $search))) {
+                $cleanSearch = str_replace(['-', ' ', '.'], '', $search);
+                $searchHash = hash('sha256', $cleanSearch);
+
+                $q->orWhere('nip_hash', $searchHash)
+                    ->orWhere('nik_hash', $searchHash)
+                    ->orWhere('nuptk_hash', $searchHash)
+                    ->orWhere('npwp_hash', $searchHash)
+                    ->orWhere('telepon_hash', $searchHash);
+            }
+
+            // ✅ 5. Search by EMAIL hash (case-insensitive)
+            if (filter_var($search, FILTER_VALIDATE_EMAIL)) {
+                $emailHash = hash('sha256', strtolower($search));
+                $q->orWhere('email_hash', $emailHash);
+            }
+
+            // ✅ 6. Search by TELEPON MASKED (partial match)
+            $q->orWhere('telepon_masked', 'like', "%{$search}%");
+
+            // ✅ 7. Search by RELASI (tidak terenkripsi)
+            // Status Pegawai
+            $q->orWhereHas('statusPegawai', function ($query) use ($search) {
+                $query->where('nama', 'like', "%{$search}%");
+            })
+
+                // Jenis Pegawai
+                ->orWhereHas('jenisPegawai', function ($query) use ($search) {
+                    $query->where('nama', 'like', "%{$search}%");
+                })
+
+                // Jabatan
+                ->orWhereHas('jabatan', function ($query) use ($search) {
+                    $query->where('nama', 'like', "%{$search}%");
+                })
+
+                // Jurusan
+                ->orWhereHas('jurusan', function ($query) use ($search) {
+                    $query->where('nama', 'like', "%{$search}%");
+                });
+        });
+    }
+
     // ===== RELATIONSHIPS =====
 
     public function jurusan()
