@@ -29,6 +29,17 @@
         [x-cloak] {
             display: none !important;
         }
+
+        .link-reset,
+        .link-reset:hover,
+        .link-reset:focus,
+        .link-reset:active,
+        .link-reset:visited {
+            all: unset;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+        }
     </style>
 
 </head>
