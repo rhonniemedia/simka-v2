@@ -23,7 +23,10 @@ class PegawaiController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Pegawai::with(['statusPegawai', 'jenisPegawai', 'jabatan', 'jurusan']);
+        $draftCount = Pegawai::where('status', 'draft')->count();
+
+        $query = Pegawai::with(['statusPegawai', 'jenisPegawai', 'jabatan', 'jurusan'])
+            ->where('status', '!=', 'draft');
 
         // Search functionality - hash akan dihandle di model
         if ($request->filled('search')) {
@@ -77,6 +80,7 @@ class PegawaiController extends Controller
 
         return view('contents.pegawai.index', compact(
             'pegawais',
+            'draftCount',
             'statusPegawais',
             'jenisPegawais',
             'jabatans',
@@ -85,22 +89,197 @@ class PegawaiController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * STEP 0: Membuka Modal Utama (Container)
      */
     public function create()
     {
-        $statusPegawais = StatusPegawai::orderBy('nama')->get();
-        $jenisPegawais = JenisPegawai::orderBy('nama')->get();
-        $jabatans = Jabatan::orderBy('nama')->get();
-        $jurusans = Jurusan::orderBy('nama')->get();
-
-        return view('contents.pegawai.partials.form', [
+        return view('contents.pegawai.partials.form-container', [
             'pegawai' => new Pegawai(),
-            'statusPegawais' => $statusPegawais,
-            'jenisPegawais' => $jenisPegawais,
-            'jabatans' => $jabatans,
-            'jurusans' => $jurusans
         ]);
+    }
+
+    /**
+     * STEP 1: Simpan Awal (Create Draft)
+     */
+    public function storeStep1(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'jk' => 'required|in:L,P',
+                'agama' => 'required',
+                't_lahir' => 'required',
+                'tgl_lahir' => 'required|date',
+                'nik' => 'required|digits:16|unique:pegawais,nik_hash',
+                'kawin_tanggungan' => 'required|string',
+            ]);
+
+            // Tambahkan status draft secara manual
+            $validated['status'] = 'draft';
+
+            // Simpan ke database dan tampung ke variabel $pegawai
+            $pegawai = Pegawai::create($validated);
+
+            // Jika ini request HTMX, kita langsung kirim view Step 2
+            // Anda bisa menyisipkan header untuk notifikasi sukses jika perlu
+            return view('contents.pegawai.partials.form-step2', [
+                'pegawai' => $pegawai,
+                'statusPegawais' => StatusPegawai::all(),
+                'jenisPegawais' => JenisPegawai::all(),
+                'jabatans' => Jabatan::all(),
+                'jurusans' => Jurusan::all(),
+            ]);
+        } catch (ValidationException $e) {
+            // Gunakan fungsi error handling Anda
+            return $this->validationErrorResponse(new Pegawai(), $e, 'contents.pegawai.partials.form-step1', 'pegawai');
+        }
+    }
+
+    /**
+     * STEP 2 & 3: Update Progress Draft
+     */
+    public function updateStep(Request $request, $id, $nextStep)
+    {
+        // Ambil data pegawai berdasarkan ID yang dikirim dari hidden input
+        $pegawai = Pegawai::findOrFail($request->pegawai_id);
+
+        try {
+            $validated = $request->validate([
+                'sp_id' => 'required|exists:status_pegawais,id',
+                'jp_id' => 'required|exists:jenis_pegawais,id',
+                'jab_id' => 'required|exists:jabatans,id',
+                'jurusan_id' => 'required|exists:jurusans,id',
+                // Unik kecuali untuk ID pegawai ini sendiri agar tidak error saat update
+                'nip' => 'nullable|digits:18|unique:pegawais,nip,' . $pegawai->id,
+                'nuptk' => 'nullable|digits:16|unique:pegawais,nuptk,' . $pegawai->id,
+                'pmk' => 'nullable|in:ya,tidak',
+                'pmk_tmt' => 'required_if:pmk,ya|nullable|date',
+                'pmk_thn' => 'required_if:pmk,ya|nullable|numeric|min:0',
+                'pmk_bln' => 'required_if:pmk,ya|nullable|numeric|min:0|max:11',
+            ]);
+
+            $validated['pmk'] = $validated['pmk'] ?? 'tidak';
+
+            // Update data pegawai
+            $pegawai->update($validated);
+
+            // Jika berhasil, kirim view Step 3 (misal: Data Keluarga atau Dokumen)
+            return view('contents.pegawai.partials.form-step' . $nextStep, [
+                'pegawai' => $pegawai,
+                // Tambahkan data pendukung untuk step 3 jika ada
+            ]);
+        } catch (ValidationException $e) {
+            // Jika validasi gagal, kembalikan ke form step 2 dengan pesan error
+            // Kita perlu mengirimkan kembali data pendukung agar dropdown tidak kosong
+
+            $prevStep = $nextStep - 1;
+
+            return $this->validationErrorResponse(
+                $pegawai,
+                $e,
+                'contents.pegawai.partials.form-step' . $prevStep,
+                'pegawai',
+                [
+                    'statusPegawais' => StatusPegawai::all(),
+                    'jenisPegawais' => JenisPegawai::all(),
+                    'jabatans' => Jabatan::all(),
+                    'jurusans' => Jurusan::all(),
+                ]
+            );
+        }
+
+
+
+
+        $pegawai = Pegawai::findOrFail($id);
+
+        // Ambil aturan validasi berdasarkan step yang baru saja diisi
+        $rules = $this->getValidationRules($nextStep - 1);
+        $validated = $request->validate($rules);
+
+        $pegawai->update($validated);
+
+        return view("contents.pegawai.partials.form-step{$nextStep}", compact('pegawai'));
+    }
+
+    /**
+     * STEP 4: Finalisasi (Draft -> Aktif)
+     */
+    public function finalize(Request $request, $id)
+    {
+        $pegawai = Pegawai::findOrFail($id);
+        $validated = $request->validate($this->getValidationRules(4));
+
+        // Update data terakhir dan ubah status menjadi aktif
+        $pegawai->update(array_merge($validated, ['status' => 'aktif']));
+
+        // Beri sinyal HTMX untuk menutup modal dan refresh tabel
+        return response('', 200)
+            ->header('HX-Trigger', 'pegawaiUpdated');
+    }
+
+    /**
+     * Menampilkan daftar pegawai yang masih berstatus draf di dalam modal
+     */
+    public function listDrafts()
+    {
+        // Mengambil semua data pegawai dengan status draft
+        $drafts = Pegawai::where('status', 'draft')
+            ->latest()
+            ->get();
+
+        // Mengembalikan view partial yang berisi list draf
+        return view('contents.pegawai.partials.draft-list', compact('drafts'));
+    }
+
+    /**
+     * Fitur Lanjutkan: Mendeteksi draf mana yang harus dibuka
+     */
+    public function resume($id)
+    {
+        $pegawai = Pegawai::findOrFail($id);
+
+        if (!$pegawai->sp_id) {
+            return view('contents.pegawai.partials.form-step2', [
+                'pegawai' => $pegawai,
+                'statusPegawais' => StatusPegawai::all(),
+                'jenisPegawais' => JenisPegawai::all(),
+                'jabatans' => Jabatan::all(),
+                'jurusans' => Jurusan::all(),
+            ]);
+        }
+
+        if (!$pegawai->nik_hash) {
+            return view('contents.pegawai.partials.form-step3', compact('pegawai'));
+        }
+
+        return view('contents.pegawai.partials.form-step4', compact('pegawai'));
+    }
+
+    /**
+     * Aturan Validasi per Step
+     */
+    private function getValidationRules($step)
+    {
+        return match ($step) {
+            2 => [
+                'sp_id' => 'required|uuid',
+                'jp_id' => 'required|uuid',
+                'jab_id' => 'required|uuid',
+                'jurusan_id' => 'required|uuid',
+                'pmk' => 'nullable|string',
+            ],
+            3 => [
+                'nik' => 'required|numeric|digits:16',
+                'nip' => 'nullable|numeric',
+                'besaran_gaji' => 'nullable|numeric',
+            ],
+            4 => [
+                'telepon' => 'required|string',
+                'jalan' => 'required|string',
+            ],
+            default => [],
+        };
     }
 
     /**

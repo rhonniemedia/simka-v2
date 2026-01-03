@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Jurusan;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Database\Eloquent\Model;
@@ -91,6 +92,16 @@ class Pegawai extends Model
         'tmt_mk' => 'date',
         'tmt_status' => 'date',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($pegawai) {
+            // Membuat slug otomatis dari nama + random string agar unik
+            if (empty($pegawai->peg_slug)) {
+                $pegawai->peg_slug = Str::slug($pegawai->nama) . '-' . Str::lower(Str::random(5));
+            }
+        });
+    }
 
     // ===== AUTO ENCRYPT/DECRYPT =====
 

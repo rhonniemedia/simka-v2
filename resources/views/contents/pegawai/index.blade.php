@@ -23,13 +23,27 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">📦 Data Produk</h5>
-                    <button class="btn btn-primary"
-                        hx-get="/pegawais/create"
-                        hx-target="#mainModal-content"
-                        hx-push-url="false">
-                        + Tambah Produk
-                    </button>
+                    <h5 class="mb-0">📦 Data Pegawai</h5>
+                    <div class="d-flex gap-2">
+                        {{-- Tombol Lanjutkan hanya muncul jika ada data draf --}}
+                        @if(isset($draftCount) && $draftCount > 0)
+                        <button class="btn btn-warning fw-bold text-dark"
+                            hx-get="{{ route('pegawais.drafts') }}"
+                            hx-target="#mainModal-content"
+                            hx-push-url="false"
+                            data-bs-toggle="modal"
+                            data-bs-target="#mainModal">
+                            <i class="mdi mdi-history"></i> Lanjutkan ({{ $draftCount }})
+                        </button>
+                        @endif
+
+                        <button class="btn btn-primary"
+                            hx-get="/pegawais/create"
+                            hx-target="#mainModal-content"
+                            hx-push-url="false">
+                            + Tambah Pegawai
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Filter Component -->

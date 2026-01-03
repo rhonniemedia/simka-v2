@@ -21,17 +21,17 @@ return new class extends Migration
             $table->string('peg_slug')->unique()->comment('URL-friendly slug');
 
             // ===== RELASI (Plain - untuk JOIN) menggunakan UUID =====
-            $table->foreignUuid('sp_id')
+            $table->foreignUuid('sp_id')->nullable()
                 ->constrained('status_pegawais')
                 ->onDelete('restrict')
                 ->comment('Status Pegawai: PNS/PPPK/Honorer');
 
-            $table->foreignUuid('jp_id')
+            $table->foreignUuid('jp_id')->nullable()
                 ->constrained('jenis_pegawais')
                 ->onDelete('restrict')
                 ->comment('Jenis Pegawai: Pendidik/Kependidikan');
 
-            $table->foreignUuid('jab_id')
+            $table->foreignUuid('jab_id')->nullable()
                 ->constrained('jabatans')
                 ->onDelete('restrict')
                 ->comment('Jabatan utama pegawai');
@@ -73,6 +73,10 @@ return new class extends Migration
                 ->comment('Pangkat/Golongan');
             $table->date('tmt_mk')->nullable()
                 ->comment('TMT Masa Kerja');
+            $table->unsignedSmallInteger('pmk_thn')->nullable()
+                ->comment('Masa kerja dalam tahun');
+            $table->unsignedTinyInteger('pmk_bln')->nullable()
+                ->comment('Masa kerja dalam bulan');
 
             // ===== DATA PRIBADI (Encrypted) =====
 
@@ -99,11 +103,11 @@ return new class extends Migration
             // ===== KONTAK (Encrypted + Hashed) =====
 
             // Telepon - Encrypted, Masked, UNIQUE
-            $table->text('telepon_encrypted')
+            $table->text('telepon_encrypted')->nullable()
                 ->comment('Nomor telepon encrypted');
-            $table->string('telepon_hash', 64)->unique()
+            $table->string('telepon_hash', 64)->nullable()->unique()
                 ->comment('SHA256 hash - untuk uniqueness');
-            $table->string('telepon_masked', 20)
+            $table->string('telepon_masked', 20)->nullable()
                 ->comment('Format masked: 0812****7890 untuk display list');
 
             // Email - Encrypted, Searchable, Login, UNIQUE
@@ -113,19 +117,19 @@ return new class extends Migration
                 ->comment('SHA256 hash - untuk search, login, dan uniqueness');
 
             // ===== ALAMAT (Encrypted) =====
-            $table->text('jalan_encrypted')
+            $table->text('jalan_encrypted')->nullable()
                 ->comment('Alamat jalan encrypted');
-            $table->text('desa_kelurahan_encrypted')
+            $table->text('desa_kelurahan_encrypted')->nullable()
                 ->comment('Desa/Kelurahan encrypted');
             $table->text('rt_encrypted')->nullable()
                 ->comment('RT encrypted');
             $table->text('rw_encrypted')->nullable()
                 ->comment('RW encrypted');
-            $table->text('kecamatan_encrypted')
+            $table->text('kecamatan_encrypted')->nullable()
                 ->comment('Kecamatan encrypted');
-            $table->text('kabupaten_kota_encrypted')
+            $table->text('kabupaten_kota_encrypted')->nullable()
                 ->comment('Kabupaten/Kota encrypted');
-            $table->text('provinsi_encrypted')
+            $table->text('provinsi_encrypted')->nullable()
                 ->comment('Provinsi encrypted');
             $table->text('kode_pos_encrypted')->nullable()
                 ->comment('Kode pos encrypted');
@@ -133,14 +137,14 @@ return new class extends Migration
             // ===== FILE & STATUS =====
             $table->string('foto')->nullable()
                 ->comment('Path file foto profil');
-            $table->foreignUuid('jurusan_id')
+            $table->foreignUuid('jurusan_id')->nullable()
                 ->constrained('jurusans')
                 ->onDelete('restrict')
                 ->comment('Jurusan/bidang keahlian');
-            $table->enum('status', ['aktif', 'mutasi', 'pensiun'])
-                ->default('aktif')
+            $table->enum('status', ['aktif', 'mutasi', 'pensiun', 'draft'])
+                ->default('draft')
                 ->index()
-                ->comment('Status kepegawaian aktif');
+                ->comment('Status kepegawaian draf');
             $table->date('tmt_status')->nullable()
                 ->comment('TMT Status kepegawaian saat ini');
 
