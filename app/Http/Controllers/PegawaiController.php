@@ -108,20 +108,48 @@ class PegawaiController extends Controller
                 'nama' => 'required|string|max:255',
                 'jk' => 'required|in:L,P',
                 'agama' => 'required',
-                't_lahir' => 'required',
+                't_lahir' => 'required|string|max:255',
                 'tgl_lahir' => 'required|date',
-                'nik' => 'required|digits:16|unique:pegawais,nik_hash',
+                'nik' => [
+                    'required',
+                    'digits:16',
+                    // Validasi unique menggunakan scope dari model
+                    function ($attribute, $value, $fail) {
+                        if (Pegawai::byNik($value)->exists()) {
+                            $fail('NIK sudah terdaftar.');
+                        }
+                    },
+                ],
                 'kawin_tanggungan' => 'required|string',
+                'npwp' => [
+                    'nullable',
+                    'string',
+                    'regex:/^[0-9]{15,16}$/',
+                    function ($attribute, $value, $fail) {
+                        if (Pegawai::byNpwp($value)->exists()) {
+                            $fail('NPWP sudah terdaftar.');
+                        }
+                    },
+                ],
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
-            // Tambahkan status draft secara manual
+            // Handle upload foto jika ada
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto');
+                $fotoName = time() . '_' . $foto->getClientOriginalName();
+                $foto->storeAs('public/pegawai', $fotoName);
+                $validated['foto'] = $fotoName;
+            }
+
+            // Tambahkan status draft
             $validated['status'] = 'draft';
 
-            // Simpan ke database dan tampung ke variabel $pegawai
+            // Simpan ke database
+            // Model akan otomatis hash NIK melalui setAttribute()
             $pegawai = Pegawai::create($validated);
 
-            // Jika ini request HTMX, kita langsung kirim view Step 2
-            // Anda bisa menyisipkan header untuk notifikasi sukses jika perlu
+            // Return view Step 2 dengan data lengkap
             return view('contents.pegawai.partials.form-step2', [
                 'pegawai' => $pegawai,
                 'statusPegawais' => StatusPegawai::all(),
@@ -130,76 +158,200 @@ class PegawaiController extends Controller
                 'jurusans' => Jurusan::all(),
             ]);
         } catch (ValidationException $e) {
-            // Gunakan fungsi error handling Anda
-            return $this->validationErrorResponse(new Pegawai(), $e, 'contents.pegawai.partials.form-step1', 'pegawai');
+            // PENTING: Gunakan trait HtmxResponse yang sudah ada
+            return $this->validationErrorResponse(
+                new Pegawai(),
+                $e,
+                'contents.pegawai.partials.form-step1',
+                'pegawai'
+            );
         }
     }
 
     /**
-     * STEP 2 & 3: Update Progress Draft
+     * STEP 2 & 3: Update Progress Draft (Dynamic)
      */
     public function updateStep(Request $request, $id, $nextStep)
     {
         // Ambil data pegawai berdasarkan ID yang dikirim dari hidden input
         $pegawai = Pegawai::findOrFail($request->pegawai_id);
 
-        try {
-            $validated = $request->validate([
-                'sp_id' => 'required|exists:status_pegawais,id',
-                'jp_id' => 'required|exists:jenis_pegawais,id',
-                'jab_id' => 'required|exists:jabatans,id',
-                'jurusan_id' => 'required|exists:jurusans,id',
-                // Unik kecuali untuk ID pegawai ini sendiri agar tidak error saat update
-                'nip' => 'nullable|digits:18|unique:pegawais,nip,' . $pegawai->id,
-                'nuptk' => 'nullable|digits:16|unique:pegawais,nuptk,' . $pegawai->id,
-                'pmk' => 'nullable|in:ya,tidak',
-                'pmk_tmt' => 'required_if:pmk,ya|nullable|date',
-                'pmk_thn' => 'required_if:pmk,ya|nullable|numeric|min:0',
-                'pmk_bln' => 'required_if:pmk,ya|nullable|numeric|min:0|max:11',
-            ]);
+        // Step yang sedang diisi (sebelum next)
+        $currentStep = $nextStep - 1;
 
-            $validated['pmk'] = $validated['pmk'] ?? 'tidak';
+        try {
+            // Dapatkan aturan validasi berdasarkan step saat ini
+            $rules = $this->getValidationRulesForStep($currentStep, $pegawai);
+
+            $validated = $request->validate($rules);
+
+            // Handle default value untuk field tertentu
+            if ($currentStep == 2 && !isset($validated['pmk'])) {
+                $validated['pmk'] = 'tidak';
+            }
 
             // Update data pegawai
             $pegawai->update($validated);
 
-            // Jika berhasil, kirim view Step 3 (misal: Data Keluarga atau Dokumen)
-            return view('contents.pegawai.partials.form-step' . $nextStep, [
-                'pegawai' => $pegawai,
-                // Tambahkan data pendukung untuk step 3 jika ada
-            ]);
-        } catch (ValidationException $e) {
-            // Jika validasi gagal, kembalikan ke form step 2 dengan pesan error
-            // Kita perlu mengirimkan kembali data pendukung agar dropdown tidak kosong
+            // Dapatkan view data untuk step berikutnya
+            $viewData = $this->getViewDataForStep($nextStep, $pegawai);
 
-            $prevStep = $nextStep - 1;
+            // Return view untuk step berikutnya
+            return view('contents.pegawai.partials.form-step' . $nextStep, $viewData);
+        } catch (ValidationException $e) {
+            // Dapatkan view data untuk step saat ini (yang error)
+            $viewData = $this->getViewDataForStep($currentStep, $pegawai);
 
             return $this->validationErrorResponse(
                 $pegawai,
                 $e,
-                'contents.pegawai.partials.form-step' . $prevStep,
+                'contents.pegawai.partials.form-step' . $currentStep,
                 'pegawai',
-                [
-                    'statusPegawais' => StatusPegawai::all(),
-                    'jenisPegawais' => JenisPegawai::all(),
-                    'jabatans' => Jabatan::all(),
-                    'jurusans' => Jurusan::all(),
-                ]
+                $viewData
             );
         }
+    }
 
+    /**
+     * Dapatkan aturan validasi berdasarkan step
+     */
+    private function getValidationRulesForStep(int $step, Pegawai $pegawai): array
+    {
+        return match ($step) {
+            // Step 2: Data Kepegawaian
+            2 => [
+                'sp_id' => 'required|exists:status_pegawais,id',
+                'jp_id' => 'required|exists:jenis_pegawais,id',
+                'jab_id' => 'required|exists:jabatans,id',
+                'jurusan_id' => 'required|exists:jurusans,id',
 
+                // Validasi NIP dengan custom rule untuk hash
+                'nip' => [
+                    'nullable',
+                    'digits:18',
+                    function ($attribute, $value, $fail) use ($pegawai) {
+                        if (!$value) return;
 
+                        $exists = Pegawai::byNip($value)
+                            ->where('id', '!=', $pegawai->id)
+                            ->exists();
 
-        $pegawai = Pegawai::findOrFail($id);
+                        if ($exists) {
+                            $fail('NIP sudah terdaftar.');
+                        }
+                    },
+                ],
 
-        // Ambil aturan validasi berdasarkan step yang baru saja diisi
-        $rules = $this->getValidationRules($nextStep - 1);
-        $validated = $request->validate($rules);
+                // Validasi NUPTK dengan custom rule untuk hash
+                'nuptk' => [
+                    'nullable',
+                    'digits:16',
+                    function ($attribute, $value, $fail) use ($pegawai) {
+                        if (!$value) return;
 
-        $pegawai->update($validated);
+                        $exists = Pegawai::byNuptk($value)
+                            ->where('id', '!=', $pegawai->id)
+                            ->exists();
 
-        return view("contents.pegawai.partials.form-step{$nextStep}", compact('pegawai'));
+                        if ($exists) {
+                            $fail('NUPTK sudah terdaftar.');
+                        }
+                    },
+                ],
+
+                'pmk' => 'nullable|in:ya,tidak',
+                'pmk_tmt' => 'required_if:pmk,ya|nullable|date',
+                'pmk_thn' => 'required_if:pmk,ya|nullable|numeric|min:0',
+                'pmk_bln' => 'required_if:pmk,ya|nullable|numeric|min:0|max:11',
+            ],
+
+            // Step 3: Data Alamat
+            3 => [
+                'jalan' => 'nullable|string|max:255',
+                'rt' => 'nullable|string|max:5',
+                'rw' => 'nullable|string|max:5',
+                'desa_kelurahan' => 'required|string|max:100',
+                'kecamatan' => 'required|string|max:100',
+                'kabupaten_kota' => 'required|string|max:100',
+                'provinsi' => 'required|string|max:100',
+                'kode_pos' => 'nullable|string|max:10',
+            ],
+
+            // Step 4: Data Kontak & Finalisasi
+            4 => [
+                // Telepon Utama (Required)
+                'telepon' => 'required|string|max:20',
+
+                // TMT Status (Required)
+                'tmt_status' => 'required|date',
+
+                // Telepon Alternatif (Optional)
+                'telepon_alternatif' => 'nullable|string|max:20',
+
+                // Email Utama (Required) dengan validasi unique
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    function ($attribute, $value, $fail) use ($pegawai) {
+                        $exists = Pegawai::byEmail($value)
+                            ->where('id', '!=', $pegawai->id)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('Email utama sudah terdaftar.');
+                        }
+                    },
+                ],
+
+                // Email Alternatif (Optional) dengan validasi unique
+                'email_alternatif' => [
+                    'nullable',
+                    'email',
+                    'max:255',
+                    function ($attribute, $value, $fail) use ($pegawai) {
+                        if (!$value) return;
+
+                        // Cek jika email alternatif sama dengan email utama
+                        if (request('email') && $value === request('email')) {
+                            $fail('Email alternatif tidak boleh sama dengan email utama.');
+                            return;
+                        }
+
+                        $exists = Pegawai::byEmail($value)
+                            ->where('id', '!=', $pegawai->id)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail('Email alternatif sudah terdaftar.');
+                        }
+                    },
+                ],
+            ],
+
+            default => [],
+        };
+    }
+
+    /**
+     * Dapatkan data tambahan untuk view berdasarkan step
+     */
+    private function getViewDataForStep(int $step, Pegawai $pegawai): array
+    {
+        $data = ['pegawai' => $pegawai];
+
+        // Step 2 membutuhkan dropdown options
+        if ($step == 2) {
+            $data['statusPegawais'] = StatusPegawai::all();
+            $data['jenisPegawais'] = JenisPegawai::all();
+            $data['jabatans'] = Jabatan::all();
+            $data['jurusans'] = Jurusan::all();
+        }
+
+        // Step 3 tidak butuh data tambahan
+        // Step 4 mungkin butuh data tambahan di masa depan
+
+        return $data;
     }
 
     /**
@@ -208,14 +360,33 @@ class PegawaiController extends Controller
     public function finalize(Request $request, $id)
     {
         $pegawai = Pegawai::findOrFail($id);
-        $validated = $request->validate($this->getValidationRules(4));
 
-        // Update data terakhir dan ubah status menjadi aktif
-        $pegawai->update(array_merge($validated, ['status' => 'aktif']));
+        try {
+            // Gunakan method getValidationRulesForStep yang sudah ada
+            $validated = $request->validate(
+                $this->getValidationRulesForStep(4, $pegawai)
+            );
 
-        // Beri sinyal HTMX untuk menutup modal dan refresh tabel
-        return response('', 200)
-            ->header('HX-Trigger', 'pegawaiUpdated');
+            // Update data terakhir dan ubah status menjadi aktif
+            $pegawai->update(array_merge($validated, [
+                'status' => 'aktif',
+                'tmt_status' => $validated['tmt_status'] ?? now(),
+            ]));
+
+            // Beri sinyal HTMX untuk menutup modal dan refresh tabel
+            return response('', 200)
+                ->header('HX-Trigger', json_encode([
+                    'pegawaiUpdated' => true,
+                    'closeModal' => true,
+                ]));
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse(
+                $pegawai,
+                $e,
+                'contents.pegawai.partials.form-step4',
+                'pegawai'
+            );
+        }
     }
 
     /**
@@ -257,117 +428,6 @@ class PegawaiController extends Controller
     }
 
     /**
-     * Aturan Validasi per Step
-     */
-    private function getValidationRules($step)
-    {
-        return match ($step) {
-            2 => [
-                'sp_id' => 'required|uuid',
-                'jp_id' => 'required|uuid',
-                'jab_id' => 'required|uuid',
-                'jurusan_id' => 'required|uuid',
-                'pmk' => 'nullable|string',
-            ],
-            3 => [
-                'nik' => 'required|numeric|digits:16',
-                'nip' => 'nullable|numeric',
-                'besaran_gaji' => 'nullable|numeric',
-            ],
-            4 => [
-                'telepon' => 'required|string',
-                'jalan' => 'required|string',
-            ],
-            default => [],
-        };
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'nama' => 'required|string|max:255',
-                'sp_id' => 'required|uuid|exists:status_pegawais,id',
-                'jp_id' => 'required|uuid|exists:jenis_pegawais,id',
-                'jab_id' => 'required|uuid|exists:jabatans,id',
-                'jurusan_id' => 'required|uuid|exists:jurusans,id',
-
-                // Nomor Identitas
-                'nip' => 'nullable|string|max:50',
-                'nik' => 'required|string|max:16',
-                'nuptk' => 'nullable|string|max:50',
-                'npwp' => 'nullable|string|max:50',
-
-                // Data Finansial
-                'no_rek' => 'nullable|string|max:50',
-                'besaran_gaji' => 'nullable|numeric|min:0',
-
-                // Data Kepegawaian
-                'pmk' => 'nullable|string|max:50',
-                'tmt_mk' => 'nullable|date',
-
-                // Data Pribadi
-                't_lahir' => 'required|string|max:100',
-                'tgl_lahir' => 'required|date',
-                'jk' => 'required|in:L,P',
-                'agama' => 'required|string|max:50',
-                'kawin_tanggungan' => 'nullable|string|max:50',
-
-                // Kontak
-                'telepon' => 'required|string|max:20',
-                'email' => 'nullable|email|max:255',
-
-                // Alamat
-                'jalan' => 'required|string|max:255',
-                'desa_kelurahan' => 'required|string|max:100',
-                'rt' => 'nullable|string|max:5',
-                'rw' => 'nullable|string|max:5',
-                'kecamatan' => 'required|string|max:100',
-                'kabupaten_kota' => 'required|string|max:100',
-                'provinsi' => 'required|string|max:100',
-                'kode_pos' => 'nullable|string|max:10',
-
-                // File & Status
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'status' => 'required|in:aktif,mutasi,pensiun',
-                'tmt_status' => 'nullable|date',
-            ]);
-
-            // Upload Foto
-            if ($request->hasFile('foto')) {
-                $foto = $request->file('foto');
-                $fotoName = time() . '_' . Str::slug($validated['nama']) . '.' . $foto->getClientOriginalExtension();
-                $foto->storeAs('public/pegawai/foto', $fotoName);
-                $validated['foto'] = 'pegawai/foto/' . $fotoName;
-            }
-
-            // Audit
-            $validated['created_by'] = auth()->id();
-
-            // Create pegawai - enkripsi dan hashing akan dihandle di model
-            Pegawai::create($validated);
-
-            return $this->successResponse('pegawaiSaved', 'Data pegawai berhasil ditambahkan.');
-        } catch (ValidationException $e) {
-            $statusPegawais = StatusPegawai::orderBy('nama')->get();
-            $jenisPegawais = JenisPegawai::orderBy('nama')->get();
-            $jabatans = Jabatan::orderBy('nama')->get();
-            $jurusans = Jurusan::orderBy('nama')->get();
-
-            return $this->validationErrorResponse(
-                new Pegawai(),
-                $e,
-                'contents.pegawai.partials.form',
-                'pegawai',
-                compact('statusPegawais', 'jenisPegawais', 'jabatans', 'jurusans')
-            );
-        }
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(Pegawai $pegawai)
@@ -394,111 +454,5 @@ class PegawaiController extends Controller
             'jabatans',
             'jurusans'
         ));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Pegawai $pegawai)
-    {
-        try {
-            $validated = $request->validate([
-                'nama' => 'required|string|max:255',
-                'sp_id' => 'required|uuid|exists:status_pegawais,id',
-                'jp_id' => 'required|uuid|exists:jenis_pegawais,id',
-                'jab_id' => 'required|uuid|exists:jabatans,id',
-                'jurusan_id' => 'required|uuid|exists:jurusans,id',
-
-                // Nomor Identitas
-                'nip' => 'nullable|string|max:50',
-                'nik' => 'required|string|max:16',
-                'nuptk' => 'nullable|string|max:50',
-                'npwp' => 'nullable|string|max:50',
-
-                // Data Finansial
-                'no_rek' => 'nullable|string|max:50',
-                'besaran_gaji' => 'nullable|numeric|min:0',
-
-                // Data Kepegawaian
-                'pmk' => 'nullable|string|max:50',
-                'tmt_mk' => 'nullable|date',
-
-                // Data Pribadi
-                't_lahir' => 'required|string|max:100',
-                'tgl_lahir' => 'required|date',
-                'jk' => 'required|in:L,P',
-                'agama' => 'required|string|max:50',
-                'kawin_tanggungan' => 'nullable|string|max:50',
-
-                // Kontak
-                'telepon' => 'required|string|max:20',
-                'email' => 'nullable|email|max:255',
-
-                // Alamat
-                'jalan' => 'required|string|max:255',
-                'desa_kelurahan' => 'required|string|max:100',
-                'rt' => 'nullable|string|max:5',
-                'rw' => 'nullable|string|max:5',
-                'kecamatan' => 'required|string|max:100',
-                'kabupaten_kota' => 'required|string|max:100',
-                'provinsi' => 'required|string|max:100',
-                'kode_pos' => 'nullable|string|max:10',
-
-                // File & Status
-                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-                'status' => 'required|in:aktif,mutasi,pensiun',
-                'tmt_status' => 'nullable|date',
-            ]);
-
-            // Upload Foto baru
-            if ($request->hasFile('foto')) {
-                // Delete old foto
-                if ($pegawai->foto) {
-                    Storage::delete('public/' . $pegawai->foto);
-                }
-
-                $foto = $request->file('foto');
-                $fotoName = time() . '_' . Str::slug($validated['nama']) . '.' . $foto->getClientOriginalExtension();
-                $foto->storeAs('public/pegawai/foto', $fotoName);
-                $validated['foto'] = 'pegawai/foto/' . $fotoName;
-            }
-
-            // Audit
-            $validated['updated_by'] = auth()->id();
-
-            // Update pegawai - enkripsi dan hashing akan dihandle di model
-            $pegawai->fill($validated);
-
-            if (!$pegawai->isDirty()) {
-                return $this->infoResponse('Tidak Ada Perubahan', 'Data tetap sama.', 'pegawaiUpdated');
-            }
-
-            $pegawai->save();
-
-            return $this->successResponse('pegawaiUpdated', 'Data pegawai berhasil diperbarui.');
-        } catch (ValidationException $e) {
-            $statusPegawais = StatusPegawai::orderBy('nama')->get();
-            $jenisPegawais = JenisPegawai::orderBy('nama')->get();
-            $jabatans = Jabatan::orderBy('nama')->get();
-            $jurusans = Jurusan::orderBy('nama')->get();
-
-            return $this->validationErrorResponse(
-                $pegawai,
-                $e,
-                'contents.pegawai.partials.form',
-                'pegawai',
-                compact('statusPegawais', 'jenisPegawais', 'jabatans', 'jurusans')
-            );
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pegawai $pegawai)
-    {
-        $pegawai->delete();
-
-        return $this->successResponse('pegawaiUpdated', 'Data pegawai berhasil dihapus.');
     }
 }

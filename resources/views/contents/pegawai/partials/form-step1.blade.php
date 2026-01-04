@@ -1,7 +1,6 @@
 <form hx-post="{{ route('pegawais.store-step1') }}"
     hx-target="#step-content-placeholder"
     hx-encoding="multipart/form-data">
-    @csrf
     <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <div class="row">
             <div class="col-md-12 mb-3">
@@ -13,7 +12,7 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
                 <select name="jk" class="form-select @error('jk') is-invalid @enderror">
-                    <option value="" selected disabled>-- Pilih --</option>
+                    <option value="" selected disabled>-- Pilih Jenis Kelamin--</option>
                     <option value="L" {{ old('jk', $pegawai->jk ?? '') == 'L' ? 'selected' : '' }}>Laki-laki</option>
                     <option value="P" {{ old('jk', $pegawai->jk ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
                 </select>
@@ -35,7 +34,7 @@
 
             <div class="col-md-6 mb-3">
                 <label class="form-label">Tempat Lahir <span class="text-danger">*</span></label>
-                <input type="text" name="t_lahir" class="form-control @error('t_lahir') is-invalid @enderror" value="{{ old('t_lahir', $pegawai->t_lahir ?? '') }}" placeholder="Tempat Kealahiran">
+                <input type="text" name="t_lahir" class="form-control @error('t_lahir') is-invalid @enderror" value="{{ old('t_lahir', $pegawai->t_lahir ?? '') }}" placeholder="Tempat Kelahiran">
                 @error('t_lahir') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
@@ -65,7 +64,13 @@
                 @error('kawin_tanggungan') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
-            <div class="col-md-12 mb-3">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Nomor Pokok Wajib Pajak (NPWP) <span class="text-danger">*</span></label>
+                <input type="number" name="npwp" class="form-control @error('npwp') is-invalid @enderror" value="{{ old('npwp', $pegawai->npwp ?? '') }}" placeholder="Nomor Pokok Wajib Pajak (NPWP)">
+                @error('npwp') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="col-md-6 mb-3">
                 <label class="form-label">Foto Profil</label>
                 <input type="file" name="foto" class="form-control" accept="image/*">
             </div>

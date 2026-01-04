@@ -30,7 +30,9 @@ class Pegawai extends Model
         'no_rek',
         'besaran_gaji',
         'telepon',
+        'telepon_alternatif',
         'email',
+        'email_alternatif',
         'tgl_lahir',
         'agama',
         'jalan',
@@ -50,7 +52,9 @@ class Pegawai extends Model
         'nuptk',
         'npwp',
         'email',
+        'email_alternatif',
         'telepon',
+        'telepon_alternatif',
     ];
 
     protected $fillable = [
@@ -66,14 +70,18 @@ class Pegawai extends Model
         'no_rek',
         'besaran_gaji',
         'pmk',
-        'tmt_mk',
+        'pmk_tmt',
+        'pmk_thn',
+        'pmk_bln',
         't_lahir',
         'tgl_lahir',
         'jk',
         'agama',
         'kawin_tanggungan',
         'telepon',
+        'telepon_alternatif',
         'email',
+        'email_alternatif',
         'jalan',
         'desa_kelurahan',
         'rt',
@@ -89,7 +97,7 @@ class Pegawai extends Model
     ];
 
     protected $casts = [
-        'tmt_mk' => 'date',
+        'pmk_tmt' => 'date',
         'tmt_status' => 'date',
     ];
 

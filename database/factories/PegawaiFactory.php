@@ -57,7 +57,7 @@ class PegawaiFactory extends Factory
 
             // Data Kepegawaian (Plain)
             'pmk'        => $this->faker->randomElement(['ya', 'tidak']),
-            'tmt_mk'     => $this->faker->date(),
+            'pmk_tmt'     => $this->faker->date(),
             't_lahir'    => $this->faker->city(),
             'jk'         => $this->faker->randomElement(['L', 'P']),
             'kawin_tanggungan' => $this->faker->randomElement(['K/0', 'K/1', 'TK/0']),

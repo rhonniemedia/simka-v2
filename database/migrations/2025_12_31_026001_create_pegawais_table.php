@@ -71,7 +71,7 @@ return new class extends Migration
             // ===== DATA KEPEGAWAIAN (Plain) =====
             $table->string('pmk', 50)->nullable()
                 ->comment('Pangkat/Golongan');
-            $table->date('tmt_mk')->nullable()
+            $table->date('pmk_tmt')->nullable()
                 ->comment('TMT Masa Kerja');
             $table->unsignedSmallInteger('pmk_thn')->nullable()
                 ->comment('Masa kerja dalam tahun');
@@ -109,6 +109,20 @@ return new class extends Migration
                 ->comment('SHA256 hash - untuk uniqueness');
             $table->string('telepon_masked', 20)->nullable()
                 ->comment('Format masked: 0812****7890 untuk display list');
+
+            // TELEPON ALTERNATIF - Encrypted, Masked
+            $table->text('telepon_alternatif_encrypted')->nullable()
+                ->comment('Nomor telepon alternatif encrypted');
+            $table->string('telepon_alternatif_hash', 64)->nullable()->unique()
+                ->comment('SHA256 hash - untuk uniqueness');
+            $table->string('telepon_alternatif_masked', 20)->nullable()
+                ->comment('Format masked telepon alternatif');
+
+            // EMAIL ALTERNATIF - Encrypted, UNIQUE
+            $table->text('email_alternatif_encrypted')->nullable()
+                ->comment('Email alternatif encrypted');
+            $table->string('email_alternatif_hash', 64)->nullable()->unique()
+                ->comment('SHA256 hash - untuk uniqueness');
 
             // Email - Encrypted, Searchable, Login, UNIQUE
             $table->text('email_encrypted')->nullable()
@@ -173,6 +187,8 @@ return new class extends Migration
             $table->index('nik_hash', 'idx_nik_hash');
             $table->index('email_hash', 'idx_email_hash');
             $table->index('nuptk_hash', 'idx_nuptk_hash');
+            $table->index('telepon_alternatif_hash', 'idx_telepon_alt_hash');
+            $table->index('email_alternatif_hash', 'idx_email_alt_hash');
         });
     }
 
