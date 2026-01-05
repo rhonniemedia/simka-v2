@@ -1,5 +1,5 @@
 <form hx-put="{{ route('pegawais.finalize', $pegawai->id) }}"
-    hx-target="#mainModal-content">
+    hx-target="#step-content-placeholder">
     @method('PUT')
     <div class="modal-body">
         <div class="row">

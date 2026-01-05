@@ -94,9 +94,13 @@
                     </x-filter>
 
                     <!-- Pegawai Table -->
-                    <div id="pegawai-table">
+                    <div id="pegawai-table"
+                        hx-get="{{ route('pegawais.index') }}"
+                        hx-trigger="pegawaiUpdated from:body"
+                        hx-swap="innerHTML">
                         @include('contents.pegawai.partials.table')
                     </div>
+
                 </div>
             </div>
         </div>

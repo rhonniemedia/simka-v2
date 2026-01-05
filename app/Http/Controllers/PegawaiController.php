@@ -362,7 +362,6 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::findOrFail($id);
 
         try {
-            // Gunakan method getValidationRulesForStep yang sudah ada
             $validated = $request->validate(
                 $this->getValidationRulesForStep(4, $pegawai)
             );
@@ -373,12 +372,8 @@ class PegawaiController extends Controller
                 'tmt_status' => $validated['tmt_status'] ?? now(),
             ]));
 
-            // Beri sinyal HTMX untuk menutup modal dan refresh tabel
-            return response('', 200)
-                ->header('HX-Trigger', json_encode([
-                    'pegawaiUpdated' => true,
-                    'closeModal' => true,
-                ]));
+            // Gunakan successResponse seperti di product
+            return $this->successResponse('pegawaiUpdated', 'Data pegawai berhasil disimpan dan diaktifkan.');
         } catch (ValidationException $e) {
             return $this->validationErrorResponse(
                 $pegawai,
