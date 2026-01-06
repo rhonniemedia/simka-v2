@@ -20250,3 +20250,16 @@ dl li {
     border: 0; /* Menghilangkan border default */
     border-top: 2px solid black; /* Garis horizontal dengan ketebalan dan warna */
 }
+
+/* resources/css/app.css */
+
+.text-yellow {
+    color: #ffc107 !important;
+}
+.text-purple {
+    color: #6f42c1 !important;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #9c38c0 0%, #47137a 100%) !important;
+}

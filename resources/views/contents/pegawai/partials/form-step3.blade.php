@@ -3,7 +3,7 @@
     @method('PUT')
     @csrf
 
-    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+    <div class="modal-body">
         <div class="row">
             @if(isset($pegawai))
             <input type="hidden" name="pegawai_id" value="{{ $pegawai->id }}">
@@ -67,9 +67,12 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">
-            <span class="htmx-indicator spinner-border spinner-border-sm"></span>
-            Simpan dan Lanjut
+        <button type="submit" class="btn btn-primary btn-labeled">
+            <span class="btn-label">
+                <i class="mdi mdi-floppy save-icon"></i>
+                <span class="spinner-border spinner-border-sm htmx-indicator"></span>
+            </span>
+            Simpan & Lanjut
         </button>
     </div>
 </form>

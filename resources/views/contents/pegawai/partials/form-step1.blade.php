@@ -7,7 +7,7 @@
     <input type="hidden" name="pegawai_id" value="{{ $pegawai->id }}">
     @endif
 
-    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+    <div class="modal-body">
         <div class="row">
             <div class="col-md-12 mb-3">
                 <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
@@ -88,10 +88,16 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn btn-primary">
-            <span class="htmx-indicator spinner-border spinner-border-sm"></span>
-            Simpan dan Lanjut
+        <button type="button" class="btn btn-secondary btn-labeled" data-bs-dismiss="modal">
+            <span class="btn-label"><i class="mdi mdi-close"></i></span>
+            Batal
+        </button>
+        <button type="submit" class="btn btn-primary btn-labeled">
+            <span class="btn-label">
+                <i class="mdi mdi-floppy save-icon"></i>
+                <span class="spinner-border spinner-border-sm htmx-indicator"></span>
+            </span>
+            Simpan & Lanjut
         </button>
     </div>
 </form>

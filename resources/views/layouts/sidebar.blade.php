@@ -54,91 +54,38 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{url('data-pegawai')}}">
-                <i class="mdi mdi-library-books menu-icon"></i>
-                <span class="menu-title">Data Pegawai</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="{{url('#ui-mutasi')}}" aria-expanded="false" aria-controls="ui-mutasi">
-                <i class="mdi mdi-book-multiple menu-icon"></i>
-                <span class="menu-title">Mutasi Pegawai</span>
+            <a class="nav-link" data-toggle="collapse" href="{{url('#ui-pegawai')}}" aria-expanded="false" aria-controls="ui-pegawai">
+                <i class="mdi mdi-account-group menu-icon"></i>
+                <span class="menu-title">Pegawai</span>
                 <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="ui-mutasi">
+            <div class="collapse" id="ui-pegawai">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('mutasi/pindah-instansi')}}">Pindah Instansi</a>
+                        <a class="nav-link" href="{{url('pegawai/data')}}">Data Pegawai</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('mutasi/purna-bakti')}}">Purna Bakti</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('mutasi/mengundurkan-diri')}}">Mengundurkan Diri</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('mutasi/meninggal-dunia')}}">Meninggal Dunia</a>
+                        <a class="nav-link" href="{{url('pegawai/mutasi')}}">Mutasi</a>
                     </li>
                 </ul>
             </div>
         </li>
         <li class="nav-item">
-            <span class="nav-link mt-4">
-                <span class="menu-title font-weight-bold">Berkas Pegawai</span>
-            </span>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="{{url('#ui-pendidik')}}" aria-expanded="false" aria-controls="ui-pendidik">
-                <i class="mdi mdi-human-greeting menu-icon"></i>
-                <span class="menu-title">Pendidik</span>
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="ui-pendidik">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/pns-pendidik')}}">Pendidik PNS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/pppk-pendidik')}}">Pendidik PPPK</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/honorer-pendidik')}}">Pendidik Honorer</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="{{url('#ui-kependidikan')}}" aria-expanded="false" aria-controls="ui-kependidikan">
-                <i class="mdi mdi-account-multiple menu-icon"></i>
-                <span class="menu-title">Kependidikan</span>
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="ui-kependidikan">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/pns-tendik')}}">Tendik PNS</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/pppk-tendik')}}">Tendik PPPK</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('archives/honorer-tendik')}}">Tendik Honorer</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-        @can('admin')
-        <li class="nav-item">
-            <a class="nav-link" href="{{url('dokumen-verifikasi')}}">
-                <i class="mdi mdi-file-check menu-icon"></i>
-                <span class="menu-title">Berkas Terpadu</span>
+            <a class="nav-link" href="{{url('kepegawaian/pangkat')}}">
+                <i class="mdi mdi mdi-file-chart menu-icon"></i>
+                <span class="menu-title">Dokumen</span>
             </a>
         </li>
-        @endcan
         <li class="nav-item">
             <span class="nav-link mt-4">
                 <span class="menu-title font-weight-bold">Kepegawaian</span>
             </span>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{url('kepegawaian/pangkat')}}">
+                <i class="mdi mdi-account-star menu-icon"></i>
+                <span class="menu-title">Kepangkatan</span>
+            </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{url('kepegawaian/berkala')}}">
@@ -147,10 +94,16 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{url('kepegawaian/pangkat')}}">
-                <i class="mdi mdi-account-star menu-icon"></i>
-                <span class="menu-title">Kepangkatan</span>
+            <a class="nav-link" href="{{url('kepegawaian/pensiun')}}">
+                <i class="mdi mdi-star-off menu-icon"></i>
+                <span class="menu-title">Pensiun</span>
             </a>
+        </li>
+
+        <li class="nav-item">
+            <span class="nav-link mt-4">
+                <span class="menu-title font-weight-bold">Pendukung</span>
+            </span>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{url('kepegawaian/pendidikan')}}">
@@ -164,12 +117,7 @@
                 <span class="menu-title">Keluarga</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{url('kepegawaian/pensiun')}}">
-                <i class="mdi mdi-star-off menu-icon"></i>
-                <span class="menu-title">Pensiun</span>
-            </a>
-        </li>
+
         @can('admin')
         <li class="nav-item">
             <span class="nav-link mt-4">
