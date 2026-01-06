@@ -1,6 +1,12 @@
-<form hx-post="{{ route('pegawais.store-step1') }}"
+<form hx-post="{{ route('pegawais.store-step1', isset($pegawai) ? $pegawai->id : '') }}"
     hx-target="#step-content-placeholder"
     hx-encoding="multipart/form-data">
+
+    @csrf
+    @if(isset($pegawai))
+    <input type="hidden" name="pegawai_id" value="{{ $pegawai->id }}">
+    @endif
+
     <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <div class="row">
             <div class="col-md-12 mb-3">
@@ -73,6 +79,11 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label">Foto Profil</label>
                 <input type="file" name="foto" class="form-control" accept="image/*">
+                @if(isset($pegawai) && $pegawai->foto)
+                <small class="text-muted d-block mt-1">
+                    <i class="mdi mdi-check-circle text-success"></i> Foto sudah terupload
+                </small>
+                @endif
             </div>
         </div>
     </div>
@@ -85,8 +96,7 @@
     </div>
 </form>
 
-
 <script>
-    document.getElementById('step-label').innerText = "Step 1: Data Pribadi";
-    document.getElementById('form-progress-bar').style.width = "0%";
+    document.getElementById('step-label').innerText = "{{ isset($pegawai) && $pegawai->exists ? $pegawai->nama : 'Step 1: Data Pribadi' }}";
+    document.getElementById('form-progress-bar').style.width = "0%"; // Belum simpan = 0%
 </script>

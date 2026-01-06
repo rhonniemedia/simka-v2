@@ -25,16 +25,32 @@
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">📦 Data Pegawai</h5>
                     <div class="d-flex gap-2">
-                        {{-- Tombol Lanjutkan hanya muncul jika ada data draf --}}
+                        {{-- Tombol Lanjutkan sebagai dropdown tanpa modal --}}
                         @if(isset($draftCount) && $draftCount > 0)
-                        <button class="btn btn-warning fw-bold text-dark"
-                            hx-get="{{ route('pegawais.drafts') }}"
-                            hx-target="#mainModal-content"
-                            hx-push-url="false"
-                            data-bs-toggle="modal"
-                            data-bs-target="#mainModal">
-                            <i class="mdi mdi-history"></i> Lanjutkan ({{ $draftCount }})
-                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-warning fw-bold text-dark dropdown-toggle"
+                                type="button"
+                                id="dropdownDrafts"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                hx-get="{{ route('pegawais.drafts') }}"
+                                hx-trigger="click once"
+                                hx-target="#draftDropdownMenu"
+                                hx-indicator="#draftLoading">
+                                <i class="mdi mdi-history"></i> Lanjutkan ({{ $draftCount }})
+                                <span id="draftLoading" class="htmx-indicator spinner-border spinner-border-sm ms-1"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end"
+                                id="draftDropdownMenu"
+                                aria-labelledby="dropdownDrafts"
+                                style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                                {{-- Konten akan dimuat via HTMX --}}
+                                <li class="text-center p-3">
+                                    <span class="spinner-border spinner-border-sm"></span>
+                                    <span class="ms-2">Memuat...</span>
+                                </li>
+                            </ul>
+                        </div>
                         @endif
 
                         <button class="btn btn-primary"

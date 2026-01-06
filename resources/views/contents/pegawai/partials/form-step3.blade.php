@@ -1,9 +1,13 @@
-<form hx-put="{{ route('pegawais.update-step', [$pegawai->id, 4]) }}"
+<form hx-put="{{ route('pegawais.update-step', [isset($pegawai) ? $pegawai->id : '', 4]) }}"
     hx-target="#step-content-placeholder">
     @method('PUT')
-    <div class="modal-body">
+    @csrf
+
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <div class="row">
+            @if(isset($pegawai))
             <input type="hidden" name="pegawai_id" value="{{ $pegawai->id }}">
+            @endif
 
             <div class="col-md-12 mb-3">
                 <label class="form-label">Jalan</label>
@@ -71,6 +75,6 @@
 </form>
 
 <script>
-    document.getElementById('step-label').innerText = "Step 3: Alamat";
+    document.getElementById('step-label').innerText = "{{ isset($pegawai) ? $pegawai->nama : 'Step 3: Alamat' }}";
     document.getElementById('form-progress-bar').style.width = "50%";
 </script>

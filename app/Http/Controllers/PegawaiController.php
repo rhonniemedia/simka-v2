@@ -101,7 +101,7 @@ class PegawaiController extends Controller
     /**
      * STEP 1: Simpan Awal (Create Draft)
      */
-    public function storeStep1(Request $request)
+    public function storeStep1(Request $request, $id = null)
     {
         try {
             $validated = $request->validate([
@@ -113,9 +113,12 @@ class PegawaiController extends Controller
                 'nik' => [
                     'required',
                     'digits:16',
-                    // Validasi unique menggunakan scope dari model
-                    function ($attribute, $value, $fail) {
-                        if (Pegawai::byNik($value)->exists()) {
+                    function ($attribute, $value, $fail) use ($id) {
+                        $query = Pegawai::byNik($value);
+                        if ($id) {
+                            $query->where('id', '!=', $id);
+                        }
+                        if ($query->exists()) {
                             $fail('NIK sudah terdaftar.');
                         }
                     },
@@ -125,8 +128,13 @@ class PegawaiController extends Controller
                     'nullable',
                     'string',
                     'regex:/^[0-9]{15,16}$/',
-                    function ($attribute, $value, $fail) {
-                        if (Pegawai::byNpwp($value)->exists()) {
+                    function ($attribute, $value, $fail) use ($id) {
+                        if (!$value) return;
+                        $query = Pegawai::byNpwp($value);
+                        if ($id) {
+                            $query->where('id', '!=', $id);
+                        }
+                        if ($query->exists()) {
                             $fail('NPWP sudah terdaftar.');
                         }
                     },
@@ -134,33 +142,52 @@ class PegawaiController extends Controller
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
-            // Handle upload foto jika ada
-            if ($request->hasFile('foto')) {
-                $foto = $request->file('foto');
-                $fotoName = time() . '_' . $foto->getClientOriginalName();
-                $foto->storeAs('public/pegawai', $fotoName);
-                $validated['foto'] = $fotoName;
+            if ($id) {
+                // Update existing draft
+                $pegawai = Pegawai::findOrFail($id);
+
+                // Handle upload foto jika ada
+                if ($request->hasFile('foto')) {
+                    // Hapus foto lama jika ada
+                    if ($pegawai->foto) {
+                        Storage::delete('public/pegawai/' . $pegawai->foto);
+                    }
+                    $foto = $request->file('foto');
+                    $fotoName = time() . '_' . $foto->getClientOriginalName();
+                    $foto->storeAs('public/pegawai', $fotoName);
+                    $validated['foto'] = $fotoName;
+                }
+
+                $pegawai->update($validated);
+            } else {
+                // Create new draft
+                // Handle upload foto jika ada
+                if ($request->hasFile('foto')) {
+                    $foto = $request->file('foto');
+                    $fotoName = time() . '_' . $foto->getClientOriginalName();
+                    $foto->storeAs('public/pegawai', $fotoName);
+                    $validated['foto'] = $fotoName;
+                }
+
+                // Tambahkan status draft
+                $validated['status'] = 'draft';
+
+                $pegawai = Pegawai::create($validated);
             }
 
-            // Tambahkan status draft
-            $validated['status'] = 'draft';
-
-            // Simpan ke database
-            // Model akan otomatis hash NIK melalui setAttribute()
-            $pegawai = Pegawai::create($validated);
-
+            $currentStep = 2;
             // Return view Step 2 dengan data lengkap
             return view('contents.pegawai.partials.form-step2', [
                 'pegawai' => $pegawai,
+                'currentStep' => $currentStep,
                 'statusPegawais' => StatusPegawai::all(),
                 'jenisPegawais' => JenisPegawai::all(),
                 'jabatans' => Jabatan::all(),
                 'jurusans' => Jurusan::all(),
             ]);
         } catch (ValidationException $e) {
-            // PENTING: Gunakan trait HtmxResponse yang sudah ada
             return $this->validationErrorResponse(
-                new Pegawai(),
+                $id ? Pegawai::find($id) : new Pegawai(),
                 $e,
                 'contents.pegawai.partials.form-step1',
                 'pegawai'
@@ -394,8 +421,8 @@ class PegawaiController extends Controller
             ->latest()
             ->get();
 
-        // Mengembalikan view partial yang berisi list draf
-        return view('contents.pegawai.partials.draft-list', compact('drafts'));
+        // Mengembalikan view partial untuk dropdown
+        return view('contents.pegawai.partials.draft-dropdown', compact('drafts'));
     }
 
     /**
@@ -405,21 +432,24 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::findOrFail($id);
 
-        if (!$pegawai->sp_id) {
-            return view('contents.pegawai.partials.form-step2', [
-                'pegawai' => $pegawai,
-                'statusPegawais' => StatusPegawai::all(),
-                'jenisPegawais' => JenisPegawai::all(),
-                'jabatans' => Jabatan::all(),
-                'jurusans' => Jurusan::all(),
-            ]);
-        }
+        // Tentukan step berdasarkan data yang sudah diisi
+        $currentStep = $this->determineCurrentStep($pegawai);
 
-        if (!$pegawai->nik_hash) {
-            return view('contents.pegawai.partials.form-step3', compact('pegawai'));
-        }
+        return view('contents.pegawai.partials.form-container', compact('pegawai', 'currentStep'));
+    }
 
-        return view('contents.pegawai.partials.form-step4', compact('pegawai'));
+    private function determineCurrentStep($pegawai)
+    {
+        // Logic untuk menentukan step mana yang harus dilanjutkan
+        if (empty($pegawai->nip)) {
+            return 1;
+        } elseif (empty($pegawai->jabatan_id)) {
+            return 2;
+        } elseif (empty($pegawai->golongan_id)) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 
     /**

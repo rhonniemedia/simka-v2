@@ -1,9 +1,13 @@
-<form hx-put="{{ route('pegawais.finalize', $pegawai->id) }}"
+<form hx-put="{{ route('pegawais.finalize', isset($pegawai) ? $pegawai->id : '') }}"
     hx-target="#step-content-placeholder">
     @method('PUT')
-    <div class="modal-body">
+    @csrf
+
+    <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
         <div class="row">
+            @if(isset($pegawai))
             <input type="hidden" name="pegawai_id" value="{{ $pegawai->id }}">
+            @endif
 
             <div class="col-md-6 mb-3">
                 <label class="form-label">Nomor Telepon <span class="text-danger">*</span></label>
@@ -52,7 +56,7 @@
             </div>
 
             <div class="col-md-3 mb-3">
-                <label class="form-label">TMT Status</label>
+                <label class="form-label">TMT Status <span class="text-danger">*</span></label>
                 <input type="date" name="tmt_status" class="form-control @error('tmt_status') is-invalid @enderror"
                     value="{{ old('tmt_status', $pegawai->tmt_status ?? '') }}">
                 @error('tmt_status') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -71,4 +75,31 @@
     document.getElementById('step-label').innerText = "Step 4: Kontak & Finalisasi";
     document.getElementById('form-progress-bar').style.width = "75%";
     document.getElementById('form-progress-bar').classList.remove('progress-bar-animated');
+
+    function handleFinalize(event) {
+        // Cek jika request berhasil (status 200)
+        if (event.detail.successful) {
+            // Set progress bar ke 100%
+            const progressBar = document.getElementById('form-progress-bar');
+            if (progressBar) {
+                progressBar.style.width = "100%";
+                progressBar.classList.add('bg-success');
+                progressBar.classList.remove('bg-info');
+            }
+
+            // Update label
+            const stepLabel = document.getElementById('step-label');
+            if (stepLabel) {
+                stepLabel.innerText = "Selesai!";
+            }
+
+            // Close modal setelah animasi selesai (500ms untuk smooth transition)
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('mainModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }, 500);
+        }
+    }
 </script>
