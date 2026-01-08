@@ -345,4 +345,14 @@ class Pegawai extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return [
+            'pindah'    => 'Pindah',
+            'meninggal' => 'Meninggal',
+            'mundur'    => 'Keluar',
+            'pensiun'   => 'Purna Bakti',
+        ][$this->status] ?? '-';
+    }
 }
