@@ -228,6 +228,7 @@
     display: inline-block;
 }
 
-.htmx-request .save-icon {
+.htmx-request .save-icon,
+.htmx-request .mdi-plus {
     display: none;
 }

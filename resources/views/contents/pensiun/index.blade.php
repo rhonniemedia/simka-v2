@@ -1,21 +1,21 @@
 @extends('layouts.main')
 
 @push('scripts')
-<script src="{{ asset('assets/js/modules/pegawai.js') }}"></script>
+<script src="{{ asset('assets/js/modules/pensiun.js') }}"></script>
 @endpush
 
 @section('container')
 
-<div class="content-wrapper pb-0" x-data="pegawaiApp()">
+<div class="content-wrapper pb-0" x-data="pensiunApp()">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
-            Hi, welcome back!
-            <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block">Your web analytics dashboard template.</span>
+            Pensiun
+            <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block">Data Pensiun Pegawai</span>
         </h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Tables</a></li>
-                <li class="breadcrumb-item active" aria-current="page"> Basic tables </li>
+                <li class="breadcrumb-item">Pegawai</li>
+                <li class="breadcrumb-item active" aria-current="page"> Pensiun </li>
             </ol>
         </nav>
     </div>
@@ -28,47 +28,20 @@
                         <div class="d-flex align-items-center">
                             <div class="icon-wrapper position-relative">
                                 <span class="bg-gradient-primary p-2 rounded-2 shadow-sm me-3 d-inline-flex align-items-center justify-content-center">
-                                    <i class="mdi mdi-account-tie mdi-24px text-white"></i>
+                                    <i class="mdi mdi-star-off mdi-24px text-white"></i>
                                 </span>
                             </div>
 
                             <div>
-                                <h4 class="mb-1 text-dark fw-bold">Data Pegawai</h4>
+                                <h4 class="mb-1 text-dark fw-bold">Pensiun Pegawai</h4>
                                 <div class="d-flex align-items-center gap-2">
-                                    <small class="text-muted">Manajemen data Kepegawaian</small>
+                                    <small class="text-muted">Manajemen data Pensiun Pegawai</small>
                                 </div>
                             </div>
                         </div>
                         <div class="d-flex gap-2">
-                            {{-- Tombol Lanjutkan sebagai dropdown tanpa modal --}}
-                            @if(isset($draftCount) && $draftCount > 0)
-                            <div class="dropdown">
-                                <button class="btn btn-warning fw-bold text-dark dropdown-toggle"
-                                    type="button"
-                                    id="dropdownDrafts"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                    hx-get="{{ route('pegawais.drafts') }}"
-                                    hx-trigger="click once"
-                                    hx-target="#draftDropdownMenu"
-                                    hx-indicator="#draftLoading">
-                                    <i class="mdi mdi-history"></i> Lanjutkan ({{ $draftCount }})
-                                    <span id="draftLoading" class="htmx-indicator spinner-border spinner-border-sm ms-1"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end"
-                                    id="draftDropdownMenu"
-                                    aria-labelledby="dropdownDrafts"
-                                    style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                                    {{-- Konten akan dimuat via HTMX --}}
-                                    <li class="text-center p-3">
-                                        <span class="spinner-border spinner-border-sm"></span>
-                                        <span class="ms-2">Memuat...</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            @endif
                             <button type="button" class="btn btn-primary btn-labeled"
-                                hx-get="/pegawais/create"
+                                hx-get="/career/retirements/create"
                                 hx-target="#mainModal-content"
                                 hx-push-url="false">
                                 <span class="btn-label">
@@ -93,17 +66,6 @@
                             </select>
                         </div>
 
-                        <!-- Status Pegawai -->
-                        <div class="col-md-3">
-                            <label class="form-label small text-muted">Status Pegawai</label>
-                            <select class="form-select" x-model="filters.sp" @change="applyFilter()">
-                                <option value="" disabled>-- Pilih Status --</option>
-                                @foreach($statusPegawais as $status)
-                                <option value="{{ $status->id }}">{{ $status->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
                         <!-- Jenis Pegawai -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Jenis Pegawai</label>
@@ -112,6 +74,17 @@
                                 @foreach($jenisPegawais as $jenis)
                                 <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Status Mutasi -->
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status Mutasi</label>
+                            <select class="form-select" x-model="filters.mutasi" @change="applyFilter()">
+                                <option value="" disabled>-- Status Mutasi --</option>
+                                <option value="pindah">Pindah Instansi</option>
+                                <option value="mundur">Mengundurkan Diri</option>
+                                <option value="meninggal">Meninggal Dunia</option>
                             </select>
                         </div>
 
@@ -127,12 +100,12 @@
                         </div>
                     </x-filter>
 
-                    <!-- Pegawai Table -->
-                    <div id="pegawai-table"
-                        hx-get="{{ route('pegawais.index') }}"
-                        hx-trigger="pegawaiUpdated from:body"
+                    <!-- Mutasi Table -->
+                    <div id="pensiun-table"
+                        hx-get="{{ route('career.retirements.index') }}"
+                        hx-trigger="pensiunUpdated from:body"
                         hx-swap="innerHTML">
-                        @include('contents.pegawai.partials.table')
+                        @include('contents.pensiun.partials.table')
                     </div>
 
                 </div>
@@ -140,8 +113,8 @@
         </div>
     </div>
 
-    <!-- Modal Detail Product (Large dengan Scroll) -->
-    <x-modal id="mainModal" size="modal-lg" :scrollable="true" />
+    <!-- Modal Component -->
+    <x-modal id="mainModal" />
 
     <!-- Loading Component -->
     <x-loading />

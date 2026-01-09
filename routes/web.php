@@ -4,6 +4,7 @@ use App\Models\JenisPegawai;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PensiunController;
 use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {

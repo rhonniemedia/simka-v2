@@ -9,13 +9,13 @@
 <div class="content-wrapper pb-0" x-data="mutasiApp()">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
-            Hi, welcome back!
-            <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block">Your web analytics dashboard template.</span>
+            Mutasi
+            <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block">Data Mutasi Pegawai</span>
         </h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">Tables</a></li>
-                <li class="breadcrumb-item active" aria-current="page"> Basic tables </li>
+                <li class="breadcrumb-item">Pegawai</li>
+                <li class="breadcrumb-item active" aria-current="page"> Mutasi </li>
             </ol>
         </nav>
     </div>
@@ -28,7 +28,7 @@
                         <div class="d-flex align-items-center">
                             <div class="icon-wrapper position-relative">
                                 <span class="bg-gradient-primary p-2 rounded-2 shadow-sm me-3 d-inline-flex align-items-center justify-content-center">
-                                    <i class="mdi mdi-account-tie mdi-24px text-white"></i>
+                                    <i class="mdi mdi-account-arrow-right mdi-24px text-white"></i>
                                 </span>
                             </div>
 
@@ -44,7 +44,10 @@
                                 hx-get="/employees/mutations/create"
                                 hx-target="#mainModal-content"
                                 hx-push-url="false">
-                                <span class="btn-label"><i class="mdi mdi-plus"></i></span>
+                                <span class="btn-label">
+                                    <i class="mdi mdi-plus"></i>
+                                    <span class="spinner-border spinner-border-sm htmx-indicator"></span>
+                                </span>
                                 Tambah
                             </button>
                         </div>

@@ -62,10 +62,10 @@
             <div class="collapse" id="ui-pegawai">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('pegawai/data')}}">Data Pegawai</a>
+                        <a class="nav-link" href="{{url('employees/data')}}">Data Pegawai</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('pegawai/mutasi')}}">Mutasi</a>
+                        <a class="nav-link" href="{{url('employees/mutations')}}">Mutasi</a>
                     </li>
                 </ul>
             </div>
@@ -94,7 +94,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{url('kepegawaian/pensiun')}}">
+            <a class="nav-link" href="{{url('career/retirements')}}">
                 <i class="mdi mdi-star-off menu-icon"></i>
                 <span class="menu-title">Pensiun</span>
             </a>

@@ -1,16 +1,16 @@
 <div class="modal-content">
-    <form hx-post="{{ $mutation->exists ? route('employees.mutations.update', $mutation->id) : route('employees.mutations.store') }}"
+    <form hx-post="{{ $retirement->exists ? route('career.retirements.update', $retirement->id) : route('career.retirements.store') }}"
         hx-encoding="multipart/form-data"
         x-data="{
-            selectedSlug: '{{ $mutation->peg_slug ?? '' }}'
+            selectedSlug: '{{ $retirement->peg_slug ?? '' }}'
         }">
 
-        @if($mutation->exists)
+        @if($retirement->exists)
         @method('PUT')
         @endif
 
         <div class="modal-header">
-            <h5 class="modal-title">{{ $mutation->exists ? 'Edit Mutasi' : 'Tambah Mutasi' }}</h5>
+            <h5 class="modal-title">{{ $retirement->exists ? 'Edit Mutasi' : 'Tambah Mutasi' }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
@@ -29,8 +29,8 @@
                         const option = document.querySelector('#datalistOptions option[value=\'' + val + '\']');
                         selectedSlug = option ? option.dataset.id : '';
                     "
-                    value="{{ $mutation->nama ?? '' }}"
-                    {{ $mutation->exists ? 'disabled' : '' }}>
+                    value="{{ $retirement->nama ?? '' }}"
+                    {{ $retirement->exists ? 'disabled' : '' }}>
 
                 <input type="hidden" name="peg_slug" x-model="selectedSlug">
 
@@ -49,14 +49,12 @@
                 </div>
             </div>
 
-            <!-- Status Mutasi -->
+            <!-- Status retirement -->
             <div class="mb-3">
-                <label for="status" class="form-label">Status Mutasi <span class="text-danger">*</span></label>
+                <label for="status" class="form-label">Status retirement <span class="text-danger">*</span></label>
                 <select class="form-select" name="status" id="status" required>
-                    <option value="" disabled {{ !$mutation->exists ? 'selected' : '' }}>-- Pilih Status --</option>
-                    <option value="pindah" {{ ($mutation->status ?? '') == 'pindah' ? 'selected' : '' }}>Pindah</option>
-                    <option value="mundur" {{ ($mutation->status ?? '') == 'mundur' ? 'selected' : '' }}>Mundur</option>
-                    <option value="meninggal" {{ ($mutation->status ?? '') == 'meninggal' ? 'selected' : '' }}>Meninggal</option>
+                    <option value="" disabled {{ !$retirement->exists ? 'selected' : '' }}>-- Pilih Status --</option>
+                    <option value="pensiun" {{ ($retirement->status ?? '') == 'pensiun' ? 'selected' : '' }}>Pensiun</option>
                 </select>
             </div>
 
@@ -68,9 +66,9 @@
                     class="form-control"
                     name="tmt_status"
                     id="tmt_status"
-                    value="{{ $mutation->tmt_status ?? '' }}"
+                    value="{{ $retirement->tmt_status ?? '' }}"
                     required>
-                <small class="form-text text-muted">Tanggal Mulai Tugas status baru</small>
+                <small class="text-muted">Terhitung mulai tanggal status baru</small>
             </div>
         </div>
 

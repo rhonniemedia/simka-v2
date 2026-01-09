@@ -155,7 +155,7 @@ return new class extends Migration
                 ->constrained('jurusans')
                 ->onDelete('restrict')
                 ->comment('Jurusan/bidang keahlian');
-            $table->enum('status', ['aktif', 'mutasi', 'pensiun', 'draft'])
+            $table->enum('status', ['aktif', 'pindah', 'pensiun', 'meninggl', 'mundur', 'draft'])
                 ->default('draft')
                 ->index()
                 ->comment('Status kepegawaian draf');
