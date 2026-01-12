@@ -1,12 +1,23 @@
 @extends('layouts.main')
 
 @push('scripts')
-<script src="{{ asset('assets/js/modules/product.js') }}"></script>
+<script src="{{ asset('assets/js/simka-core.js') }}"></script>
 @endpush
 
 @section('container')
 
-<div class="content-wrapper pb-0" x-data="productApp()">
+<div class="content-wrapper pb-0"
+    x-data="initModule({
+        moduleName: 'Product',
+        endpoint: '/products',
+        tableId: 'product-table',
+        updateEvent: 'productUpdated',
+        saveEvent: 'productSaved',
+        initialFilters: {
+            min_price: '',
+            max_price: ''
+        }
+     })">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
             Hi, welcome back!
@@ -34,42 +45,42 @@
                 <div class="card-body">
                     <!-- Filter Component -->
                     <x-filter>
-                        <!-- Search -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">🔍 Cari Produk</label>
                             <input type="text"
                                 class="form-control"
                                 placeholder="Nama atau SKU..."
-                                x-model="filters.search">
+                                x-model="filters.search"
+                                @input.debounce.500ms="applyFilter()">
                         </div>
 
-                        <!-- Min Price -->
                         <div class="col-md-2">
                             <label class="form-label small text-muted">Harga Min</label>
                             <input type="number"
                                 class="form-control"
-                                placeholder="0"
-                                x-model="filters.min_price">
+                                x-model="filters.min_price"
+                                @input.debounce.500ms="applyFilter()">
                         </div>
 
-                        <!-- Max Price -->
                         <div class="col-md-2">
                             <label class="form-label small text-muted">Harga Max</label>
                             <input type="number"
                                 class="form-control"
-                                placeholder="999999"
-                                x-model="filters.max_price">
+                                x-model="filters.max_price"
+                                @input.debounce.500ms="applyFilter()">
                         </div>
 
-                        <!-- Per Page -->
                         <div class="col-md-2">
                             <label class="form-label small text-muted">Per Halaman</label>
                             <select class="form-select" x-model="filters.per_page" @change="applyFilter()">
                                 <option value="10">10</option>
                                 <option value="25">25</option>
                                 <option value="50">50</option>
-                                <option value="100">100</option>
                             </select>
+                        </div>
+
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-light" @click="resetFilter()">Reset</button>
                         </div>
                     </x-filter>
 

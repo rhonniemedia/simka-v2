@@ -22,9 +22,7 @@
                 <td class="text-end">
                     <button class="btn btn-sm btn-outline-info"
                         hx-get="/products/{{ $p->id }}/edit"
-                        hx-target="#mainModal-content"
-                        hx-push-url="false"
-                        hx-indicator="#loading">
+                        hx-target="#mainModal-content">
                         Edit
                     </button>
                     <button class="btn btn-sm btn-outline-danger"
@@ -33,9 +31,7 @@
                     </button>
                     <button class="btn btn-sm btn-outline-warning"
                         hx-get="/products/{{ $p->id }}"
-                        hx-target="#detailModal-content"
-                        hx-push-url="false"
-                        hx-on::after-swap="Alpine.$data(document.querySelector('[x-data]')).detailModal.show()">
+                        hx-target="#detailModal-content">
                         Detail
                     </button>
                 </td>
@@ -51,26 +47,3 @@
     {{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
 </div>
 @endif
-
-<script>
-    document.addEventListener('alpine:init', () => {
-        setTimeout(() => {
-            document.querySelectorAll('.pagination a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const url = new URL(this.href);
-                    const page = url.searchParams.get('page');
-
-                    const wrapper = document.querySelector('[x-data]');
-                    if (wrapper && window.Alpine) {
-                        const app = Alpine.$data(wrapper);
-                        if (app) {
-                            app.currentPage = page;
-                            app.loadProducts(true);
-                        }
-                    }
-                });
-            });
-        }, 100);
-    });
-</script>

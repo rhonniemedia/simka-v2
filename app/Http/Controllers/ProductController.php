@@ -17,34 +17,28 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::query();
+        $products = Product::query()
+            // Filter pencarian berdasarkan nama atau SKU jika ada
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                });
+            })
+            // Filter harga minimal
+            ->when($request->filled('min_price'), function ($query) use ($request) {
+                $query->where('price', '>=', $request->min_price);
+            })
+            // Filter harga maksimal
+            ->when($request->filled('max_price'), function ($query) use ($request) {
+                $query->where('price', '<=', $request->max_price);
+            })
+            ->latest()
+            // Mengambil jumlah per halaman, otomatis default ke 10 jika tidak sesuai
+            ->paginate($request->integer('per_page', 10))
+            ->withQueryString();
 
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter by price range
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
-        }
-
-        // Per page
-        $perPage = $request->get('per_page', 10);
-        if (!in_array($perPage, [10, 25, 50, 100])) {
-            $perPage = 10;
-        }
-
-        $products = $query->latest()->paginate($perPage)->withQueryString();
-
+        // Mengembalikan partial table jika request berasal dari HTMX
         if ($request->header('HX-Request')) {
             return view('contents.product.partials.table', compact('products'));
         }
