@@ -35,11 +35,12 @@
             <div class="card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">📦 Data Produk</h5>
-                    <button class="btn btn-primary"
+                    <button
+                        class="btn btn-primary"
                         hx-get="/products/create"
                         hx-target="#mainModal-content"
-                        hx-push-url="false">
-                        + Tambah Produk
+                        hx-swap="innerHTML">
+                        <i class="bi bi-plus"></i> Tambah Mutasi
                     </button>
                 </div>
                 <div class="card-body">

@@ -34,8 +34,7 @@
                             class="link-reset"
                             hx-get="/pegawais/{{ $pegawai->id }}"
                             hx-target="#detailModal-content"
-                            hx-push-url="false"
-                            hx-on::after-swap="Alpine.$data(document.querySelector('[x-data]')).detailModal.show()">
+                            hx-push-url="false">
                             <div class="d-flex align-items-center">
                                 @if($pegawai->foto)
                                 <img src="{{ Storage::url($pegawai->foto) }}"

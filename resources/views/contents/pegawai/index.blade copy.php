@@ -1,21 +1,12 @@
 @extends('layouts.main')
 
 @push('scripts')
-<script src="{{ asset('assets/js/modules/coreApp.js') }}"></script>
+<script src="{{ asset('assets/js/modules/pegawai.js') }}"></script>
 @endpush
 
 @section('container')
 
-<div class="content-wrapper pb-0"
-    x-data="coreApp({
-        baseUrl: '/pegawais',
-        tableId: '#pegawai-table',
-        eventName: 'pegawai',
-        additionalFilters: {
-            sp_id: '',  {{-- PENTING: Gunakan nama 'sp_id' agar sesuai controller --}}
-            jp_id: ''   {{-- PENTING: Gunakan nama 'jp_id' agar sesuai controller --}}
-        }
-    })">
+<div class="content-wrapper pb-0" x-data="pegawaiApp()">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
             Hi, welcome back!
@@ -105,7 +96,7 @@
                         <!-- Status Pegawai -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Status Pegawai</label>
-                            <select class="form-select" x-model="filters.sp_id" @change="applyFilter()">
+                            <select class="form-select" x-model="filters.sp" @change="applyFilter()">
                                 <option value="" disabled>-- Pilih Status --</option>
                                 @foreach($statusPegawais as $status)
                                 <option value="{{ $status->id }}">{{ $status->nama }}</option>
@@ -116,7 +107,7 @@
                         <!-- Jenis Pegawai -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Jenis Pegawai</label>
-                            <select class="form-select" x-model="filters.jp_id" @change="applyFilter()">
+                            <select class="form-select" x-model="filters.jp" @change="applyFilter()">
                                 <option value="" disabled>-- Pilih Jenis Pegawai --</option>
                                 @foreach($jenisPegawais as $jenis)
                                 <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>

@@ -36,19 +36,10 @@
             <div class="collapse" id="ui-master">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/identitas-sekolah')}}">Unit Organisasi</a>
+                        <a class="nav-link" href="{{url('data-master/identitas-sekolah')}}">Organisasi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/dinas-instansi')}}">Dinas Instansi</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/golongan')}}">Golongan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/jenis-pegawai')}}">Jenis Pegawai</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/jenis-ptk')}}">Jenis PTK</a>
+                        <a class="nav-link" href="{{url('data-master/golongan')}}">Pegawai</a>
                     </li>
                 </ul>
             </div>
