@@ -1,12 +1,21 @@
 @extends('layouts.main')
 
 @push('scripts')
-<script src="{{ asset('assets/js/modules/mutasi.js') }}"></script>
+<script src="{{ asset('assets/js/modules/coreApp.js') }}"></script>
 @endpush
 
 @section('container')
 
-<div class="content-wrapper pb-0" x-data="mutasiApp()">
+<div class="content-wrapper pb-0" 
+    x-data="coreApp({
+            baseUrl: '/employees/mutations',
+            tableId: '#mutasi-table',
+            eventName: 'mutasi',
+            additionalFilters: {
+                status: '',  {{-- PENTING: Gunakan nama 'sp_id' agar sesuai controller --}}
+                jp_id: ''   {{-- PENTING: Gunakan nama 'jp_id' agar sesuai controller --}}
+            }
+        })">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
             Mutasi
@@ -69,7 +78,7 @@
                         <!-- Jenis Pegawai -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Jenis Pegawai</label>
-                            <select class="form-select" x-model="filters.jp" @change="applyFilter()">
+                            <select class="form-select" x-model="filters.jp_id" @change="applyFilter()">
                                 <option value="" disabled>-- Pilih Jenis Pegawai --</option>
                                 @foreach($jenisPegawais as $jenis)
                                 <option value="{{ $jenis->id }}">{{ $jenis->nama }}</option>
@@ -80,7 +89,7 @@
                         <!-- Status Mutasi -->
                         <div class="col-md-3">
                             <label class="form-label small text-muted">Status Mutasi</label>
-                            <select class="form-select" x-model="filters.mutasi" @change="applyFilter()">
+                            <select class="form-select" x-model="filters.status" @change="applyFilter()">
                                 <option value="" disabled>-- Status Mutasi --</option>
                                 <option value="pindah">Pindah Instansi</option>
                                 <option value="mundur">Mengundurkan Diri</option>

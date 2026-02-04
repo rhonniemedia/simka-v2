@@ -36,10 +36,10 @@
             <div class="collapse" id="ui-master">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/identitas-sekolah')}}">Organisasi</a>
+                        <a class="nav-link" href="{{url('master/organization')}}">Organisasi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('data-master/golongan')}}">Pegawai</a>
+                        <a class="nav-link" href="{{url('master/employe')}}">Pegawai</a>
                     </li>
                 </ul>
             </div>
