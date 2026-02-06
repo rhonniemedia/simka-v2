@@ -2,7 +2,7 @@
 <div class="card border bg-light mb-3">
     <div class="card-body filter-section pb-2">
         <form id="filter-form" @submit.prevent="applyFilter()">
-            <div class="row g-1">
+            <div class="row">
                 {{ $slot }}
 
                 <div class="col-md-1 d-flex align-items-end">

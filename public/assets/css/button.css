@@ -219,16 +219,3 @@
 .btn:active {
     transform: scale(0.98);
 }
-
-.htmx-indicator {
-    display: none;
-}
-
-.htmx-request .htmx-indicator {
-    display: inline-block;
-}
-
-.htmx-request .save-icon,
-.htmx-request .mdi-plus {
-    display: none;
-}

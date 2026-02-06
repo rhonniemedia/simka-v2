@@ -195,6 +195,7 @@ function coreApp(config = {}) {
             htmx.ajax("GET", url, {
                 target: this.tableId,
                 swap: "innerHTML",
+                indicator: "#loading",
             })
                 .then(() => {
                     clearTimeout(loadingTimeout);

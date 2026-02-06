@@ -79,14 +79,16 @@
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-outline-info"
+                    <button type="button"
+                        class="btn btn-sm btn-outline-info btn-icon-only"
                         title="Edit"
                         hx-get="/pegawais/{{ $pegawai->id }}/edit"
                         hx-target="#mainModal-content"
-                        hx-push-url="false"
-                        hx-indicator="#loading">
-                        <i class="mdi mdi-pencil"></i>
+                        hx-push-url="false">
+                        <i class="mdi mdi-pencil btn-icon"></i>
+                        <span class="spinner-border spinner-border-sm htmx-indicator-custom"></span>
                     </button>
+
 
                     <button class="btn btn-sm btn-outline-danger"
                         title="Hapus"

@@ -1,15 +1,67 @@
-/* Loading Overlay */
-.htmx-indicator {
+/* ============================================
+   LOADING INDICATORS - GLOBAL
+   ============================================ */
+
+/* Default: sembunyikan semua indicator */
+.htmx-indicator,
+.htmx-indicator-custom {
     display: none;
 }
 
-.htmx-request .htmx-indicator {
+/* Tampilkan indicator pada button yang sedang request */
+button.htmx-request .htmx-indicator,
+button.htmx-request .htmx-indicator-custom,
+a.htmx-request .htmx-indicator,
+a.htmx-request .htmx-indicator-custom {
     display: inline-block;
 }
 
+/* Tampilkan indicator pada form yang sedang submit */
+form.htmx-request .htmx-indicator,
+form.htmx-request .htmx-indicator-custom {
+    display: inline-block;
+}
+
+/* Special case: elemen yang JADI indicator */
 .htmx-request.htmx-indicator {
     display: inline-block;
 }
+
+/* ============================================
+   HIDE ICONS saat LOADING
+   ============================================ */
+
+/* Hide icon pada BUTTON yang sedang request */
+button.htmx-request .btn-label > i,
+button.htmx-request .btn-label .mdi,
+button.htmx-request .save-icon,
+button.htmx-request .mdi-plus,
+button.htmx-request .mdi-floppy,
+button.htmx-request .btn-icon,
+button.htmx-request > i.mdi-pencil,
+button.htmx-request > i.btn-icon {
+    display: none !important;
+}
+
+/* Hide icon pada BUTTON SUBMIT saat FORM sedang request */
+form.htmx-request button[type="submit"] .btn-label > i,
+form.htmx-request button[type="submit"] .save-icon,
+form.htmx-request button[type="submit"] .mdi-floppy,
+form.htmx-request button[type="submit"] .mdi {
+    display: none !important;
+}
+
+/* PENTING: Prevent icon hidden saat request BUKAN dari button/form ini */
+body.htmx-request:not(.htmx-settling) button:not(.htmx-request) .btn-label > i,
+body.htmx-request:not(.htmx-settling) button:not(.htmx-request) .mdi,
+body.htmx-request:not(.htmx-settling) form:not(.htmx-request) button[type="submit"] .btn-label > i,
+body.htmx-request:not(.htmx-settling) form:not(.htmx-request) button[type="submit"] .save-icon {
+    display: inline-block !important;
+}
+
+/* ============================================
+   LOADING OVERLAY
+   ============================================ */
 
 #loading.htmx-indicator {
     opacity: 0;
@@ -32,46 +84,16 @@
     visibility: visible !important;
 }
 
-/* .loader {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: inline-block;
-    border-top: 6px solid #fff;
-    border-right: 6px solid transparent;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
+/* ============================================
+   LOADER ANIMATION
+   ============================================ */
 
-.loader::after {
-    content: "";
-    box-sizing: border-box;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border-bottom: 6px solid #c21387ff;
-    border-left: 6px solid transparent;
-}
-
-@keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-} */
-
-/* HTML: <div class="loader"></div> */
 .loader {
     width: 65px;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: radial-gradient(farthest-side, #6b0b7e 94%, #0000) top/8px 8px
-            no-repeat,
+    background: 
+        radial-gradient(farthest-side, #6b0b7e 94%, #0000) top/8px 8px no-repeat,
         conic-gradient(#0000 30%, #6b0b7e);
     -webkit-mask: radial-gradient(
         farthest-side,
@@ -80,6 +102,7 @@
     );
     animation: l13 1s infinite linear;
 }
+
 @keyframes l13 {
     100% {
         transform: rotate(1turn);

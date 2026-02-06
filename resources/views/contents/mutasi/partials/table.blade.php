@@ -93,7 +93,7 @@
                     <span class="badge {{ $statusColor[$pegawai->status] ?? 'bg-secondary' }}">
                         {{ $pegawai->status_label }}
                     </span>
-                    <p class="mb-0"><small>{{ $pegawai->tmt_status ? $pegawai->tmt_status->translatedFormat('d F Y') : '-' }}</small></p>
+                    <p class="mb-0"><small>{{ $pegawai->tmt_status ? $pegawai->tmt_status->translatedFormat('d/m/Y') : '-' }}</small></p>
                 </td>
 
             </tr>

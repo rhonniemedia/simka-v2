@@ -6,7 +6,7 @@
 
 @section('container')
 
-<div class="content-wrapper pb-0" 
+<div class="content-wrapper pb-0"
     x-data="coreApp({
             baseUrl: '/employees/mutations',
             tableId: '#mutasi-table',
@@ -49,13 +49,14 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-primary btn-labeled"
+                            <button type="button"
+                                class="btn btn-primary btn-labeled"
                                 hx-get="/employees/mutations/create"
                                 hx-target="#mainModal-content"
                                 hx-push-url="false">
                                 <span class="btn-label">
                                     <i class="mdi mdi-plus"></i>
-                                    <span class="spinner-border spinner-border-sm htmx-indicator"></span>
+                                    <span class="spinner-border spinner-border-sm htmx-indicator-custom"></span>
                                 </span>
                                 Tambah
                             </button>
