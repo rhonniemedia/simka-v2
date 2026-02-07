@@ -14,14 +14,17 @@ class StatusPegawaiSeeder extends Seeder
             [
                 'nama' => 'PNS',
                 'alias' => 'Pegawai Negeri Sipil',
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'PPPK',
                 'alias' => 'Pegawai Pemerintah dengan Perjanjian Kerja',
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Honorer',
                 'alias' => 'Pegawai Honorer',
+                'status' => 'aktif',
             ],
         ];
 

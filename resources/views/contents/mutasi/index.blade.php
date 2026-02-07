@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @push('scripts')
-<script src="{{ asset('assets/js/modules/coreApp.js') }}"></script>
+<script src="{{ asset('assets/js/modules/core-app.js') }}"></script>
 @endpush
 
 @section('container')

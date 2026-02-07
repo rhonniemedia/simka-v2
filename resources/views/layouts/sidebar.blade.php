@@ -39,7 +39,10 @@
                         <a class="nav-link" href="{{url('master/organization')}}">Organisasi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('master/employe')}}">Pegawai</a>
+                        <a class="nav-link" href="{{url('master/resources')}}">Kepegawaian</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('master/document')}}">Dokumen</a>
                     </li>
                 </ul>
             </div>

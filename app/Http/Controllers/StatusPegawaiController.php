@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StatusPegawai;
+use App\Models\Jabatan;
+use App\Models\Jurusan;
+use App\Models\JenisPegawai;
 use Illuminate\Http\Request;
+use App\Models\StatusPegawai;
 
 class StatusPegawaiController extends Controller
 {
@@ -12,7 +15,18 @@ class StatusPegawaiController extends Controller
      */
     public function index()
     {
-        //
+        // Get filter options
+        $statusPegawais = StatusPegawai::orderBy('nama')->paginate(10);
+        $jenisPegawais = JenisPegawai::orderBy('nama')->get();
+        $jabatans = Jabatan::orderBy('nama')->get();
+        $jurusans = Jurusan::orderBy('nama')->get();
+
+        return view('contents.master.kepegawaian.index', compact(
+            'statusPegawais',
+            'jenisPegawais',
+            'jabatans',
+            'jurusans',
+        ));
     }
 
     /**

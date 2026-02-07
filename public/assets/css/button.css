@@ -219,3 +219,24 @@
 .btn:active {
     transform: scale(0.98);
 }
+
+/* Button yang tampilannya menyatu dengan form-control */
+.btn-input-addon {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    color: #6c757d;
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-input-addon:hover {
+    background-color: #cfd4d8;
+    color: #495057;
+}
+
+.btn-input-addon:focus {
+    box-shadow: none;
+    outline: none;
+}

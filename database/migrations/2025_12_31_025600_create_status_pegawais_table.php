@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('status_pegawais', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // UUID
-            $table->string('nama'); // PNS, PPPK, Honorer
-            $table->string('alias'); // Pegawai Negeri Sipil, Pegawai Pemerintah dengan Perjanjian Kerja, Honorer
+            $table->uuid('id')->primary();
+            $table->string('nama');
+            $table->string('alias');
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
         });
     }

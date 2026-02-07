@@ -6,6 +6,7 @@ use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PensiunController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StatusPegawaiController;
 
 Route::get('/', function () {
     return redirect()->route('products.index');
@@ -39,9 +40,9 @@ Route::prefix('pegawais')->name('pegawais.')->group(function () {
 
 // | MASTER
 Route::prefix('master')->name('master.')->group(function () {
-    Route::resource('schools', SekolahController::class)->names('schools');
+    Route::resource('organization', SekolahController::class)->names('organization');
+    Route::resource('resources', StatusPegawaiController::class)->names('resources');
     Route::resource('ranks', PangkatController::class)->names('ranks');
-    Route::resource('employee-statuses', StatusPegawaiController::class)->names('employee-statuses');
     Route::resource('employee-types', JenisPegawaiController::class)->names('employee-types');
     Route::resource('positions', JabatanController::class)->names('positions');
 });
