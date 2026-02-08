@@ -6,16 +6,7 @@
 
 @section('container')
 
-<div class="content-wrapper pb-0"
-    x-data="coreApp({
-        baseUrl: '/pegawais',
-        tableId: '#pegawai-table',
-        eventName: 'pegawai',
-        additionalFilters: {
-            sp_id: '',  {{-- PENTING: Gunakan nama 'sp_id' agar sesuai controller --}}
-            jp_id: ''   {{-- PENTING: Gunakan nama 'jp_id' agar sesuai controller --}}
-        }
-    })">
+<div class="content-wrapper pb-0">
     <div class="page-header flex-wrap">
         <h3 class="mb-0">
             Hi, welcome back!
@@ -50,9 +41,6 @@
                         </div>
                     </div>
 
-                    <!-- Filter Component -->
-
-
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a class="nav-link active d-flex align-items-center gap-2" data-bs-toggle="tab" href="#tab-status">
@@ -81,102 +69,50 @@
                         <!-- ================== TAB STATUS KEPEGAWAIAN ================== -->
                         <div class="tab-pane fade show active" id="tab-status">
 
-                            <!-- Status Pegawai Table -->
-                            <div id="status-pegawai-table"
-                                hx-get="{{ route('master.resources.index') }}"
-                                hx-trigger="mutasiUpdated from:body"
+                            <div id="table-container"
+                                hx-get="{{ route('master.status.index') }}"
+                                hx-trigger="load, statusUpdated from:body"
                                 hx-swap="innerHTML">
-                                @include('contents.master.kepegawaian.partials.table')
+                                <div class="text-center py-3 text-muted">
+                                    Memuat data status pegawai...
+                                </div>
                             </div>
 
                         </div>
 
                         <!-- ================== TAB JENIS PEGAWAI ================== -->
                         <div class="tab-pane fade" id="tab-jenis">
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th style="width: 40%;">
-                                                <p class="mb-0"> Nama </p>
-                                                <small>Jenis Pegawai</small>
-                                            </th>
-                                            <th style="width: 40%;">
-                                                <p class="mb-0"> Status </p>
-                                                <small>Jenis Pegawai</small>
-                                            </th>
-                                            <th style="width: 10%;">
-                                                <p class="mb-0"> Aksi </p>
-                                                <small>Edit | Delete</small>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div id="jenis-container"
+                                hx-get="{{ route('master.employee-types.index') }}"
+                                hx-trigger="load once, jenisPegawaiUpdated from:body"
+                                hx-swap="innerHTML">
+                                <div class="text-center py-3 text-muted">
+                                    Memuat data jenis pegawai...
+                                </div>
                             </div>
-
                         </div>
 
                         <!-- ================== TAB JABATAN PEGAWAI ================== -->
                         <div class="tab-pane fade" id="tab-jabatan">
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th style="width: 40%;">
-                                                <p class="mb-0"> Nama </p>
-                                                <small>Jabatan Pegawai</small>
-                                            </th>
-                                            <th style="width: 40%;">
-                                                <p class="mb-0"> Status </p>
-                                                <small>Jabatan Pegawai</small>
-                                            </th>
-                                            <th style="width: 10%;">
-                                                <p class="mb-0"> Aksi </p>
-                                                <small>Edit | Delete</small>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div id="jabatan-container"
+                                hx-get="{{ route('master.positions.index') }}"
+                                hx-trigger="load once, jabatanUpdated from:body"
+                                hx-swap="innerHTML">
+                                <div class="text-center py-3 text-muted">
+                                    Memuat data jabatan pegawai...
+                                </div>
                             </div>
-
                         </div>
 
                         <!-- ================== TAB KEPANGKATAN PEGAWAI ================== -->
                         <div class="tab-pane fade" id="tab-kepangkatan">
-
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th style="width: 30%;">
-                                                <p class="mb-0"> Nama </p>
-                                                <small>Pangkat & Golongan</small>
-                                            </th>
-                                            <th style="width: 30%;">
-                                                <p class="mb-0"> Level </p>
-                                                <small>Kepangkatan & Peruntukan</small>
-                                            </th>
-                                            <th style="width: 30%;">
-                                                <p class="mb-0"> Status </p>
-                                                <small>Kepangkatan</small>
-                                            </th>
-                                            <th style="width: 10%;">
-                                                <p class="mb-0"> Aksi </p>
-                                                <small>Edit | Delete</small>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div id="kepangkatan-container"
+                                hx-trigger="load once, kepangkatanUpdated from:body"
+                                hx-swap="innerHTML">
+                                <div class="text-center py-3 text-muted">
+                                    Memuat data kepangkatan...
+                                </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -185,12 +121,13 @@
         </div>
     </div>
 
-    <!-- Modal Detail Pegawai (Large dengan Scroll) -->
-    <x-modal id="mainModal" size="modal-lg" :scrollable="true" />
+    <!-- Modal Global (Reusable untuk semua tab) -->
+    <x-modal id="mainModal" :scrollable="true" />
 
     <!-- Loading Component -->
     <x-loading />
 
 </div>
+
 
 @endsection

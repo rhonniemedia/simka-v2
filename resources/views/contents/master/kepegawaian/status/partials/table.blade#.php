@@ -16,12 +16,29 @@
     <!-- Kanan -->
     <div class="col-12 col-md-6">
         <div class="d-flex w-100 gap-2 justify-content-md-end">
+
             <input type="search"
                 class="form-control flex-grow-1"
                 placeholder="Cari..."
-                style="max-width:250px;">
-            <button type="button" class="btn btn-input-addon">
+                name="search"
+                id="search-input"
+                value="{{ request('search') }}"
+                style="max-width:250px;"
+                hx-get="{{ route('master.status.index') }}"
+                hx-target="#table-container"
+                hx-swap="innerHTML"
+                hx-include="[name='per_page']"
+                hx-trigger="keyup changed delay:500ms, search">
+
+            <button type="button"
+                class="btn btn-input-addon"
+                hx-get="{{ route('master.status.create') }}"
+                hx-target="#mainModal-content"
+                hx-on:click="document.getElementById('mainModal-content').innerHTML = ''"
+                data-bs-toggle="modal"
+                data-bs-target="#mainModal">
                 <i class="mdi mdi-plus"></i>
+                <span class="spinner-border spinner-border-sm htmx-indicator-custom"></span>
             </button>
         </div>
     </div>
@@ -68,15 +85,22 @@
                     <button type="button"
                         class="btn btn-sm btn-outline-info btn-icon-only"
                         title="Edit"
-                        hx-get="/master/resource/{{ $sp->id }}/edit"
+                        hx-get="{{ route('master.status.edit', $sp->id) }}"
                         hx-target="#mainModal-content"
-                        hx-push-url="false">
-                        <i class="mdi mdi-pencil btn-icon"></i>
-                        <span class="spinner-border spinner-border-sm htmx-indicator-custom"></span>
+                        hx-swap="innerHTML"
+                        @click="document.getElementById('mainModal-content').innerHTML = ''"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal">
+                        <i class="mdi mdi-pencil"></i>
+                        <span class="spinner-border spinner-border-sm htmx-indicator"></span>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger"
-                        title="Hapus"
-                        @click="confirmDelete('{{ $sp->id }}', '{{ addslashes($sp->nama) }}')">
+                    <button type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        hx-delete="{{ route('master.status.destroy', $sp->id) }}"
+                        hx-target="closest tr"
+                        hx-swap="outerHTML swap:1s"
+                        hx-trigger="confirmed" {{-- 1. TAHAN, tunggu event 'confirmed' --}}
+                        @click="confirmDelete($el, '{{ addslashes($sp->nama) }}')"> {{-- 2. Kirim $el --}}
                         <i class="mdi mdi-delete"></i>
                     </button>
                 </td>

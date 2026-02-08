@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary(); // UUID
             $table->string('nama'); // Pendidik, Kependidikan
             $table->string('alias'); // Tenaga Pendidik, Tenaga Kependidikan
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
         });
     }

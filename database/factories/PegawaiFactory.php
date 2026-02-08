@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Jabatan;
+use App\Models\JabatanPegawai;
 use App\Models\Jurusan;
 use App\Models\Pegawai;
 use Illuminate\Support\Str;
@@ -27,7 +27,7 @@ class PegawaiFactory extends Factory
             // Relasi (Mengambil ID yang sudah ada atau buat baru)
             'sp_id'    => StatusPegawai::inRandomOrder()->first()?->id ?? StatusPegawai::factory(),
             'jp_id'    => JenisPegawai::inRandomOrder()->first()?->id ?? JenisPegawai::factory(),
-            'jab_id'   => Jabatan::inRandomOrder()->first()?->id ?? Jabatan::factory(),
+            'jab_id'   => JabatanPegawai::inRandomOrder()->first()?->id ?? JabatanPegawai::factory(),
 
             /**
              * KOLOM VIRTUAL (Diproses oleh Model setAttribute)

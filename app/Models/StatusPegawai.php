@@ -15,10 +15,7 @@ class StatusPegawai extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = [
-        'nama',
-        'alias',
-    ];
+    protected $guarded = ['id'];
 
     public function pegawais()
     {

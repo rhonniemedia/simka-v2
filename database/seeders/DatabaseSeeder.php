@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,           // Create Admin
             StatusPegawaiSeeder::class,  // Create PNS, PPPK, Honorer
             JenisPegawaiSeeder::class,   // Create Pendidik, Kependidikan
-            JabatanSeeder::class,        // Create Kepsek, Guru, TU, dll
+            JabatanPegawaiSeeder::class,        // Create Kepsek, Guru, TU, dll
             JurusanSeeder::class,        // Create TKJ, Akuntansi, dll
             PegawaiSeeder::class,        // Eksekusi logic 1+1+298
         ]);

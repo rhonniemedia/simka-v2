@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\JabatanPegawai;
 
-class JabatanController extends Controller
+class KepangkatanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = JabatanPegawai::orderBy('created_at');
+        $query = JenisPegawai::orderBy('nama');
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%')
@@ -20,13 +19,13 @@ class JabatanController extends Controller
         }
 
         $perPage = $request->get('per_page', 10);
-        $jabatanPegawais = $query->paginate($perPage)->withQueryString();
+        $jenisPegawais = $query->paginate($perPage)->withQueryString();
 
         if ($request->header('HX-Request')) {
-            return view('contents.master.kepegawaian.jabatan.partials.table', compact('jabatanPegawais'));
+            return view('contents.master.kepegawaian.jenis.partials.table', compact('jenisPegawais'));
         }
 
-        return view('contents.master.kepegawaian.index', compact('jabatanPegawais'));
+        return view('contents.master.kepegawaian.index', compact('jenisPegawais'));
     }
 
     /**
@@ -48,7 +47,7 @@ class JabatanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(JabatanPegawai $jabatan)
+    public function show(string $id)
     {
         //
     }
@@ -56,7 +55,7 @@ class JabatanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(JabatanPegawai $jabatan)
+    public function edit(string $id)
     {
         //
     }
@@ -64,7 +63,7 @@ class JabatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, JabatanPegawai $jabatan)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -72,7 +71,7 @@ class JabatanController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(JabatanPegawai $jabatan)
+    public function destroy(string $id)
     {
         //
     }

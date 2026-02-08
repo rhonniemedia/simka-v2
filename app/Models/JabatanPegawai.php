@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Jabatan extends Model
+class JabatanPegawai extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $table = 'jabatans';
+    protected $table = 'jabatan_pegawais';
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -18,6 +18,7 @@ class Jabatan extends Model
     protected $fillable = [
         'nama',
         'kode',
+        'status',
     ];
 
     protected $casts = [

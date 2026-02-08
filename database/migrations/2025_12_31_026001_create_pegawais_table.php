@@ -32,7 +32,7 @@ return new class extends Migration
                 ->comment('Jenis Pegawai: Pendidik/Kependidikan');
 
             $table->foreignUuid('jab_id')->nullable()
-                ->constrained('jabatans')
+                ->constrained('jabatan_pegawais')
                 ->onDelete('restrict')
                 ->comment('Jabatan utama pegawai');
 

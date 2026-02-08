@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Jabatan;
+use App\Models\JabatanPegawai;
 use App\Models\Jurusan;
 use App\Models\Pegawai;
 use Illuminate\Support\Str;
@@ -21,8 +21,8 @@ class PegawaiSeeder extends Seeder
         $adminId = User::first()?->id ?? User::factory()->create()->id;
 
         // 2. Ambil ID Jabatan Spesifik (Asumsi tabel jabatans sudah ada isinya)
-        $jabKepsek = Jabatan::where('nama', 'LIKE', '%Kepala Sekolah%')->first();
-        $jabTU = Jabatan::where('nama', 'LIKE', '%Koordinator Tata Usaha%')->first();
+        $jabKepsek = JabatanPegawai::where('nama', 'LIKE', '%Kepala Sekolah%')->first();
+        $jabTU = JabatanPegawai::where('nama', 'LIKE', '%Koordinator Tata Usaha%')->first();
 
         // 3. Buat Kepala Sekolah (1 Orang)
         Pegawai::create([

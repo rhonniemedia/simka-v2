@@ -21,7 +21,7 @@ return new class extends Migration
                 ->comment('Referensi ke pegawais table');
 
             $table->foreignUuid('jab_id')
-                ->constrained('jabatans')
+                ->constrained('jabatan_pegawais')
                 ->onDelete('restrict')
                 ->comment('Jabatan yang pernah dijabat');
 

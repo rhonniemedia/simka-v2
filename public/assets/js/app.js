@@ -84,7 +84,7 @@ window.initModal = function (modalId = "mainModal") {
  */
 window.confirmDelete = function (id, name, url, refreshCallback) {
     if (typeof Swal === "undefined") {
-        if (confirm(`Yakin hapus ${name}?`)) {
+        if (confirm(`Apakah Anda yakin ingin menghapus ${name}?`)) {
             htmx.ajax("DELETE", url, { target: "body", swap: "none" });
         }
         return;
@@ -92,7 +92,7 @@ window.confirmDelete = function (id, name, url, refreshCallback) {
 
     Swal.fire({
         title: "Hapus?",
-        text: `Yakin hapus ${name}?`,
+        text: `Apakah Anda yakin ingin menghapus ${name}?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Ya, Hapus!",

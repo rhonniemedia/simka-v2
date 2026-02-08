@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jabatans', function (Blueprint $table) {
+        Schema::create('jabatan_pegawais', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID
             $table->string('nama');
             $table->string('kode')->unique();
+            $table->enum('status', ['aktif', 'arsip'])->default('aktif');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jabatans');
+        Schema::dropIfExists('jabatan_pegawais');
     }
 };

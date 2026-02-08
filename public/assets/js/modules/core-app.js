@@ -2,12 +2,37 @@
  * Global CRUD Module (Alpine.js)
  * Versi Final: Event Delegation untuk Pagination (Stabil) + Loading Fix
  */
+
+// --- GLOBAL MODAL HANDLER ---
+// Berjalan otomatis untuk semua modal di aplikasi (Global)
+if (!window.modalGlobalInitialized) {
+    document.addEventListener("show.bs.modal", (e) => {
+        const content = document.getElementById(e.target.id + "-content");
+        if (content) {
+            content.innerHTML =
+                '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+        }
+    });
+
+    document.addEventListener("hidden.bs.modal", (e) => {
+        const content = document.getElementById(e.target.id + "-content");
+        if (content) content.innerHTML = "";
+
+        // Bersihkan sisa backdrop
+        document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+    });
+    window.modalGlobalInitialized = true;
+}
+
 function coreApp(config = {}) {
     return {
         // Konfigurasi
         baseUrl: config.baseUrl || "",
         tableId: config.tableId || "#data-table",
         modalId: config.modalId || "mainModal",
+        successEvents: config.successEvents || [],
         detailId: config.detailId || "detailModal",
         eventName: config.eventName || "entity",
 
@@ -36,6 +61,19 @@ function coreApp(config = {}) {
                 this.bsModal = window.initModal(this.modalId);
                 this.detailModal = window.initModal(this.detailId);
             }
+
+            // AUTO-CLOSE MODAL (Dinamis berdasarkan list event khusus)
+            this.successEvents.forEach((evt) => {
+                document.body.addEventListener(evt, () => {
+                    const modalEl = document.getElementById(this.modalId);
+                    if (modalEl) {
+                        const instance =
+                            bootstrap.Modal.getInstance(modalEl) ||
+                            new bootstrap.Modal(modalEl);
+                        instance.hide();
+                    }
+                });
+            });
 
             // 3. Setup
             this.loadFiltersFromURL();
@@ -217,11 +255,23 @@ function coreApp(config = {}) {
             window.history.pushState({}, "", url);
         },
 
-        confirmDelete(id, name) {
-            const deleteUrl = `${this.baseUrl}/${id}`;
-            if (window.confirmDelete) {
-                window.confirmDelete(id, name, deleteUrl);
-            }
+        confirmDelete(el, name) {
+            // <-- Parameter pertama 'el' (element)
+            Swal.fire({
+                title: "Hapus Data?",
+                text: `Apakah Anda yakin ingin menghapus "${name}"?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Ya, Hapus!",
+                cancelButtonText: "Batal",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // ✅ KUNCI: Kirim event 'confirmed' ke tombol agar HTMX jalan
+                    el.dispatchEvent(new CustomEvent("confirmed"));
+                }
+            });
         },
     };
 }

@@ -3,9 +3,12 @@
 use App\Models\JenisPegawai;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MutasiController;
+use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PensiunController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\KepegawaianController;
+use App\Http\Controllers\JenisPegawaiController;
 use App\Http\Controllers\StatusPegawaiController;
 
 Route::get('/', function () {
@@ -39,12 +42,15 @@ Route::prefix('pegawais')->name('pegawais.')->group(function () {
 // Route::middleware(['auth'])->group(function () {
 
 // | MASTER
+
+Route::get('/master/resources', [KepegawaianController::class, 'index'])->name('employee');
+
 Route::prefix('master')->name('master.')->group(function () {
-    Route::resource('organization', SekolahController::class)->names('organization');
-    Route::resource('resources', StatusPegawaiController::class)->names('resources');
-    Route::resource('ranks', PangkatController::class)->names('ranks');
-    Route::resource('employee-types', JenisPegawaiController::class)->names('employee-types');
+    Route::resource('organization', OrganisasiController::class)->names('organization');
+    Route::resource('status', StatusPegawaiController::class)->names('status')->parameters(['status' => 'statusPegawai']);
+    Route::resource('employee-types', JenisPegawaiController::class)->names('employee-types')->parameters(['employee-types' => 'jenisPegawai']);
     Route::resource('positions', JabatanController::class)->names('positions');
+    // Route::resource('ranks', KepangkatanController::class)->names('ranks');
 });
 
 // | EMPLOYEES

@@ -17,10 +17,12 @@ class JenisPegawaiSeeder extends Seeder
             [
                 'nama' => 'Tenaga Pendidik',
                 'alias' => 'pendidik',
+                'status' => 'aktif',
             ],
             [
                 'nama' => 'Tenaga Kependidikan',
                 'alias' => 'kependidikan',
+                'status' => 'aktif',
             ],
         ];
 
