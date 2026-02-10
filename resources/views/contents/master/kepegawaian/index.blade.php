@@ -68,52 +68,40 @@
 
                         <!-- ================== TAB STATUS KEPEGAWAIAN ================== -->
                         <div class="tab-pane fade show active" id="tab-status">
-
-                            <div id="table-container"
-                                hx-get="{{ route('master.status.index') }}"
-                                hx-trigger="load, statusUpdated from:body"
-                                hx-swap="innerHTML">
+                            <div id="table-container">
                                 <div class="text-center py-3 text-muted">
-                                    Memuat data status pegawai...
+                                    Klik tab untuk memuat data status pegawai...
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- ================== TAB JENIS PEGAWAI ================== -->
                         <div class="tab-pane fade" id="tab-jenis">
-                            <div id="jenis-container"
-                                hx-get="{{ route('master.employee-types.index') }}"
-                                hx-trigger="load once, jenisPegawaiUpdated from:body"
-                                hx-swap="innerHTML">
+                            <div id="jenis-container">
                                 <div class="text-center py-3 text-muted">
-                                    Memuat data jenis pegawai...
+                                    Klik tab untuk memuat data jenis pegawai...
                                 </div>
                             </div>
                         </div>
 
                         <!-- ================== TAB JABATAN PEGAWAI ================== -->
                         <div class="tab-pane fade" id="tab-jabatan">
-                            <div id="jabatan-container"
-                                hx-get="{{ route('master.positions.index') }}"
-                                hx-trigger="load once, jabatanUpdated from:body"
-                                hx-swap="innerHTML">
+                            <div id="jabatan-container">
                                 <div class="text-center py-3 text-muted">
-                                    Memuat data jabatan pegawai...
+                                    Klik tab untuk memuat data jabatan pegawai...
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ================== TAB KEPANGKATAN PEGAWAI ================== -->
+                        <!-- ================== TAB KEPANGKATAN ================== -->
                         <div class="tab-pane fade" id="tab-kepangkatan">
-                            <div id="kepangkatan-container"
-                                hx-trigger="load once, kepangkatanUpdated from:body"
-                                hx-swap="innerHTML">
+                            <div id="kepangkatan-container">
                                 <div class="text-center py-3 text-muted">
-                                    Memuat data kepangkatan...
+                                    Klik tab untuk memuat data kepangkatan...
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                 </div>
@@ -128,6 +116,37 @@
     <x-loading />
 
 </div>
+
+@push('scripts')
+<script>
+    const tabRoutes = {
+        '#tab-status': ['{{ route("master.status.index") }}', '#table-container'],
+        '#tab-jenis': ['{{ route("master.employee-types.index") }}', '#jenis-container'],
+        '#tab-jabatan': ['{{ route("master.positions.index") }}', '#jabatan-container'],
+    }
+
+    // load pertama kali (tab default aktif)
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstTab = document.querySelector('.nav-link.active')
+        if (firstTab) {
+            const target = firstTab.getAttribute('href')
+            if (tabRoutes[target]) {
+                const [url, container] = tabRoutes[target]
+                htmx.ajax('GET', url, container)
+            }
+        }
+    })
+
+    // setiap ganti tab
+    document.addEventListener('shown.bs.tab', function(e) {
+        const target = e.target.getAttribute('href')
+        if (tabRoutes[target]) {
+            const [url, container] = tabRoutes[target]
+            htmx.ajax('GET', url, container)
+        }
+    })
+</script>
+@endpush
 
 
 @endsection

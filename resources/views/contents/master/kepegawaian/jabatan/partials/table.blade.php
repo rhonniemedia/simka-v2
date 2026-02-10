@@ -29,15 +29,14 @@
                 id="search-input"
                 value="{{ request('search') }}"
                 style="max-width:250px;"
-                hx-get="{{ route('master.employee-types.index') }}"
-                hx-target="#table-container"
+                hx-get="{{ route('master.positions.index') }}"
+                hx-target="#jabatan-container"
                 hx-swap="innerHTML"
-                hx-include="[name='per_page']"
                 hx-trigger="keyup changed delay:500ms, search">
 
             <button type="button"
                 class="btn btn-input-addon"
-                hx-get="{{ route('master.employee-types.create') }}"
+                hx-get="{{ route('master.positions.create') }}"
                 hx-target="#mainModal-content"
                 hx-swap="innerHTML"
                 data-bs-toggle="modal"

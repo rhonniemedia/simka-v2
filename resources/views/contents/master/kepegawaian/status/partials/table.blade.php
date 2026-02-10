@@ -32,7 +32,6 @@
                 hx-get="{{ route('master.status.index') }}"
                 hx-target="#table-container"
                 hx-swap="innerHTML"
-                hx-include="[name='per_page']"
                 hx-trigger="keyup changed delay:500ms, search">
 
             <button type="button"

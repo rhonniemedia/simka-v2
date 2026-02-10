@@ -49,7 +49,7 @@ Route::prefix('master')->name('master.')->group(function () {
     Route::resource('organization', OrganisasiController::class)->names('organization');
     Route::resource('status', StatusPegawaiController::class)->names('status')->parameters(['status' => 'statusPegawai']);
     Route::resource('employee-types', JenisPegawaiController::class)->names('employee-types')->parameters(['employee-types' => 'jenisPegawai']);
-    Route::resource('positions', JabatanController::class)->names('positions');
+    Route::resource('positions', JabatanController::class)->names('positions')->parameters(['positions' => 'jabatanPegawai']);
     // Route::resource('ranks', KepangkatanController::class)->names('ranks');
 });
 

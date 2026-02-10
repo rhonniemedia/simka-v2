@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JenisPegawai;
-use App\Traits\HtmxResponse;
 use Illuminate\Http\Request;
+use App\Traits\HtmxResponse;
+use App\Models\JenisPegawai;
 
 class JenisPegawaiController extends Controller
 {

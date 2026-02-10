@@ -30,9 +30,8 @@
                 value="{{ request('search') }}"
                 style="max-width:250px;"
                 hx-get="{{ route('master.employee-types.index') }}"
-                hx-target="#table-container"
+                hx-target="#jenis-container"
                 hx-swap="innerHTML"
-                hx-include="[name='per_page']"
                 hx-trigger="keyup changed delay:500ms, search">
 
             <button type="button"

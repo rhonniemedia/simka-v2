@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Traits\HtmxResponse;
 use App\Models\JabatanPegawai;
 
 class JabatanController extends Controller
