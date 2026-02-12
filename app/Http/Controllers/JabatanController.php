@@ -17,7 +17,7 @@ class JabatanController extends Controller
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('alias', 'like', '%' . $request->search . '%');
+                ->orWhere('kode', 'like', '%' . $request->search . '%');
         }
 
         $perPage = $request->get('per_page', 10);

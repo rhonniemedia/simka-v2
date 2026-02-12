@@ -6,8 +6,8 @@
             <select class="form-select form-select"
                 style="width:80px;"
                 name="per_page"
-                hx-get="{{ route('master.employee-types.index') }}"
-                hx-target="#table-container"
+                hx-get="{{ route('master.positions.index') }}"
+                hx-target="#jabatan-container"
                 hx-include="[name='search']">
                 <option value="5" {{ request('per_page') == 5 ? 'selected' : '' }}>5</option>
                 <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
@@ -94,7 +94,7 @@
                     <button type="button"
                         class="btn btn-sm btn-outline-info btn-icon-only"
                         title="Edit"
-                        hx-get="{{ route('master.employee-types.edit', $jp->id) }}"
+                        hx-get="{{ route('master.positions.edit', $jp->id) }}"
                         hx-target="#mainModal-content"
                         hx-swap="innerHTML"
                         data-bs-toggle="modal"
@@ -104,7 +104,7 @@
                     </button>
                     <button type="button"
                         class="btn btn-sm btn-outline-danger"
-                        hx-delete="{{ route('master.employee-types.destroy', $jp->id) }}"
+                        hx-delete="{{ route('master.positions.destroy', $jp->id) }}"
                         hx-target="closest tr"
                         hx-swap="outerHTML swap:1s"
                         hx-trigger="confirmed"
